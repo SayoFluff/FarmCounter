@@ -1,8 +1,9 @@
 ## Interface: 110002
 ## Title: FarmCounter
-## Notes: Der ultimative Tracker: Erze, Kräuter, Leder, Housing, VZ & Kochen.
+## Notes: Multi-Language Tracker (Ores, Herbs, Leather, Housing, Enchanting, Cooking).
 ## Author: Sayo-Flufftiger
-## Version: 5.1
+## Version: 6.0
 ## SavedVariablesPerCharacter: FarmCounterDB
 
+Localization.lua
 FarmCounter.lua

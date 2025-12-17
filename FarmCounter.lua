@@ -1,18 +1,13 @@
 -- ============================================================================
--- FARMCOUNTER 5.1 - Quality of Life Update
+-- FARMCOUNTER 6.0 - Multi-Language Support
 -- ============================================================================
 
 local addonName, addonTable = ...
+local L = addonTable.L -- Wir laden die Übersetzungen
 
 -- ----------------------------------------------------------------------------
 -- 1. Variablen & Konfiguration
 -- ----------------------------------------------------------------------------
-local EXPANSION_NAMES = {
-    [0] = "Classic", [1] = "The Burning Crusade", [2] = "Wrath of the Lich King",
-    [3] = "Cataclysm", [4] = "Mists of Pandaria", [5] = "Warlords of Draenor",
-    [6] = "Legion", [7] = "Battle for Azeroth", [8] = "Shadowlands",
-    [9] = "Dragonflight", [10] = "The War Within", [-1] = "Lade Daten..."
-}
 
 -- Filter Konstanten
 local FILTER_ALL        = 1
@@ -79,7 +74,7 @@ TitleBar:SetPoint("TOPLEFT", 2, -2); TitleBar:SetPoint("TOPRIGHT", -2, -2)
 TitleBar.bg = TitleBar:CreateTexture(nil, "BACKGROUND")
 TitleBar.bg:SetAllPoints(); TitleBar.bg:SetColorTexture(0.2, 0.2, 0.2, 1)
 TitleBar.text = TitleBar:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-TitleBar.text:SetPoint("CENTER"); TitleBar.text:SetText("FarmCounter")
+TitleBar.text:SetPoint("CENTER"); TitleBar.text:SetText(L["TITLE"]) -- Lokalisiert
 TitleBar.text:SetTextColor(1, 0.8, 0.4)
 
 -- Dragging
@@ -134,14 +129,14 @@ UpdateBorderColor = function()
 end
 
 local function GetFilterName(mode)
-    if mode == FILTER_ALL then return "Alles (Gesamt)" end
-    if mode == FILTER_ORES then return "Nur Erze & Steine" end
-    if mode == FILTER_HERBS then return "Nur Kräuter" end
-    if mode == FILTER_SKINNING then return "Leder & Stoffe" end
-    if mode == FILTER_HOUSING then return "Hölzer & Mat." end
-    if mode == FILTER_ENCHANTING then return "Verzauberkunst" end
-    if mode == FILTER_COOKING then return "Fleisch & Fisch" end
-    return "Unbekannt"
+    if mode == FILTER_ALL then return L["FILTER_ALL"] end
+    if mode == FILTER_ORES then return L["FILTER_ORES"] end
+    if mode == FILTER_HERBS then return L["FILTER_HERBS"] end
+    if mode == FILTER_SKINNING then return L["FILTER_SKINNING"] end
+    if mode == FILTER_HOUSING then return L["FILTER_HOUSING"] end
+    if mode == FILTER_ENCHANTING then return L["FILTER_ENCHANTING"] end
+    if mode == FILTER_COOKING then return L["FILTER_COOKING"] end
+    return "Unknown"
 end
 
 local function ToggleFilter()
@@ -150,11 +145,12 @@ local function ToggleFilter()
     UpdateMinimapIcon()
     UpdateBorderColor()
     UpdateFarmList()
-    print("|cFF00FF00FarmCounter:|r Filter: " .. GetFilterName(db.filterMode))
+    -- Lokalisiert:
+    print("|cFF00FF00FarmCounter:|r " .. L["FILTER_CHANGE"] .. " " .. GetFilterName(db.filterMode))
 end
 
 -- ----------------------------------------------------------------------------
--- 4. Minimap Button (ICONS)
+-- 4. Minimap Button
 -- ----------------------------------------------------------------------------
 local minimapBtn, minimapIcon
 
@@ -219,9 +215,14 @@ local function InitMinimapButton()
     
     minimapBtn:SetScript("OnEnter", function(self)
         GameTooltip:SetOwner(self, "ANCHOR_LEFT")
-        GameTooltip:AddLine("FarmCounter 5.7")
+        GameTooltip:AddLine(L["TITLE"] .. " 6.0")
+        GameTooltip:AddLine(L["TOOLTIP_HINT_LEFT"], 1, 1, 1)
+        GameTooltip:AddLine(L["TOOLTIP_HINT_SHIFT"], 0, 1, 0)
+        GameTooltip:AddLine(L["TOOLTIP_HINT_RIGHT"], 0.7, 0.7, 0.7)
+        GameTooltip:AddLine(" ")
+        
         local c = BORDER_COLORS[db.filterMode or 1]
-        GameTooltip:AddDoubleLine("Filter:", GetFilterName(db.filterMode), 1, 1, 1, c[1], c[2], c[3])
+        GameTooltip:AddDoubleLine(L["FILTER_CHANGE"], GetFilterName(db.filterMode), 1, 1, 1, c[1], c[2], c[3])
         GameTooltip:Show()
     end)
     minimapBtn:SetScript("OnLeave", function() GameTooltip:Hide() end)
@@ -300,7 +301,8 @@ UpdateFarmList = function()
 
     if not foundItems then
         local row = GetItemRow(1)
-        row.icon:SetTexture(nil); row.count:SetText(""); row.name:SetText("Nichts gefunden.")
+        row.icon:SetTexture(nil); row.count:SetText(""); 
+        row.name:SetText(L["NOTHING_FOUND"]) -- Lokalisiert
         row:SetPoint("TOPLEFT", Content, "TOPLEFT", 0, 0); row:Show()
         return
     end
@@ -313,7 +315,7 @@ UpdateFarmList = function()
             missingData = true
             local _, _, _, _, iconInstant = C_Item.GetItemInfoInstant(itemID)
             table.insert(groups, { id = -1, items = {} })
-            name = "Lade..."; icon = iconInstant
+            name = L["LOADING"]; icon = iconInstant -- Lokalisiert
         end
         if not groups[targetExp] then groups[targetExp] = { id = targetExp, items = {} } end
         table.insert(groups[targetExp].items, { id = itemID, count = count, name = name, quality = quality or 1, icon = icon })
@@ -327,7 +329,11 @@ UpdateFarmList = function()
     for _, group in ipairs(sortedGroups) do
         local header = GetHeaderRow(hIdx)
         header.expacID = group.id
-        header.text:SetText(EXPANSION_NAMES[group.id] or ("ID " .. group.id))
+        
+        -- Lokalisiert: Wir holen den Expansions-Namen aus der Tabelle L
+        local expKey = "EXP_" .. group.id
+        header.text:SetText(L[expKey] or ("ID " .. group.id))
+        
         header.status:SetText(collapsedGroups[group.id] and "+" or "-")
         header:SetPoint("TOPLEFT", Content, "TOPLEFT", 0, yOffset); header:Show()
         yOffset = yOffset - 25; hIdx = hIdx + 1
@@ -375,7 +381,7 @@ FarmFrame:SetScript("OnEvent", function(self, event, arg1)
 
         if db.isVisible then FarmFrame:Show() else FarmFrame:Hide() end
 
-        print("|cFF00FF00FarmCounter 5.7|r geladen.")
+        print("|cFF00FF00FarmCounter 6.0|r " .. L["LOADED"]) -- Lokalisiert
     elseif event == "BAG_UPDATE" and self:IsShown() then
         UpdateFarmList()
     elseif event == "GET_ITEM_INFO_RECEIVED" then
