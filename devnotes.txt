@@ -1,0 +1,19 @@
+PROJEKT: FarmCounter (WoW Addon)
+STATUS: Funktioniert stand Patch 11.0.7 (The War Within)
+
+FUNKTIONSWEISE:
+1. Scannt Taschen nach Items mit ClassID 7 (Handwerkswaren).
+2. Filtert nach SubClasses:
+   - Erze (2)
+   - Kräuter (3)
+   - Leder/Stoff (4)
+   - Housing/Holz (SubIDs: 1, 11, 13)
+   - VZ (12)
+   - Kochen (8)
+3. Speichert Fenster-Position & Filter pro Charakter (SavedVariablesPerCharacter).
+4. Nutzt FileIDs für Icons, um Fehler zu vermeiden.
+
+ANLEITUNG FÜR UPDATE (z.B. Midnight):
+1. In der .toc Datei die Interface-Nummer aktualisieren.
+2. In der .lua Datei die Tabelle 'EXPANSION_NAMES' erweitern:
+   [11] = "Midnight" (oder welche ID die neue Expansion hat).
