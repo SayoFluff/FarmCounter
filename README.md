@@ -1,9 +1,3 @@
-Hier ist eine professionelle und vollständige Beschreibung für deine **Main Project Page** auf CurseForge.
-
-Sie hebt alle Features hervor, die wir eingebaut haben (Housing, Farben, Multi-Language, Speicherfunktion) und ist übersichtlich formatiert.
-
----
-
 # FarmCounter
 
 **FarmCounter** is a lightweight, all-in-one farming tracker designed to keep your inventory organized and your farming sessions efficient. Whether you are gathering herbs, mining ores, skinning leather, or collecting materials for the **Housing System**, FarmCounter gives you a clear, real-time overview of your loot.
