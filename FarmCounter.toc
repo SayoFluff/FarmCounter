@@ -1,0 +1,8 @@
+## Interface: 110002
+## Title: FarmCounter
+## Notes: All-in-One Tracker mit Speicherfunktion (Position, Größe, Filter).
+## Author: Sayo-Flufftiger
+## Version: 4.0
+## SavedVariables: FarmCounterDB
+
+FarmCounter.lua
