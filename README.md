@@ -1,21 +1,64 @@
-FarmCounter - The Ultimate Farming Tracker
+Hier ist eine professionelle und vollständige Beschreibung für deine **Main Project Page** auf CurseForge.
 
-FarmCounter is a lightweight addon designed to track your farming sessions effortlessly.
+Sie hebt alle Features hervor, die wir eingebaut haben (Housing, Farben, Multi-Language, Speicherfunktion) und ist übersichtlich formatiert.
 
-Features:
+---
 
-All-in-One Tracking: Tracks Ores, Herbs, Leather/Cloth, and new Housing Materials (Wood/Parts).
+# FarmCounter
 
-Smart Filter: Toggle between categories with Shift + Left Click on the minimap button.
+**FarmCounter** is a lightweight, all-in-one farming tracker designed to keep your inventory organized and your farming sessions efficient. Whether you are gathering herbs, mining ores, skinning leather, or collecting materials for the **Housing System**, FarmCounter gives you a clear, real-time overview of your loot.
 
-Visual Feedback: The window border changes color based on your active filter (Red for Ore, Green for Herbs, Blue for Housing, etc.).
+### ✨ Key Features
 
-Memory: Remembers position, size, and filter settings after logout.
+* **All-in-One Tracking:** Automatically detects and counts items in your bags based on category (Ores, Herbs, Leather, Wood, Enchanting, Cooking).
+* **Dynamic Visual Feedback:** The window border changes color based on your active filter, so you always know what you are tracking at a glance.
+* **Housing Ready:** Fully supports the new **Housing Materials** (Wood, Parts & Materials), including specific items like *Aschenholz/Ashwood*.
+* **Smart Memory:** Window position, size, and active filters are saved **separately for each character**.
+* **Multi-Language:** Fully localized in English, German, French, Spanish, and Italian.
 
-Minimap Button: Full drag-and-drop support.
+---
 
-Commands:
+### 🔍 Filters & Visuals
 
-/fc - Toggle window
+Switch between filters instantly by **Shift-Clicking** the Minimap button. The border color and icon update automatically:
 
-/fc debug - Check item IDs (useful for unknown items)
+1. 🟡 **All (Summary):** Shows everything (Gold Border).
+2. 🔴 **Ores & Stone:** Tracks Mining resources (Red Border / Pickaxe Icon).
+3. 🟢 **Herbs:** Tracks Herbalism resources (Green Border / Flower Icon).
+4. 🟤 **Leather & Cloth:** Tracks Skinning and Tailoring drops (Brown Border / Leather Icon).
+5. 🔵 **Housing:** Tracks Wood, Parts, and Construction Materials (Blue Border / Planks Icon).
+6. 🟣 **Enchanting:** Tracks Dust, Shards, and Crystals (Purple Border / Dust Icon).
+7. 🟠 **Cooking:** Tracks Meat and Fish (Orange Border / Chicken Leg Icon).
+
+---
+
+### 🎮 How to Use
+
+* **Minimap Button:**
+* **Left Click:** Open/Close the window.
+* **Shift + Left Click:** Cycle through filters (Ores -> Herbs -> Leather -> etc.).
+* **Right Click:** Drag to move the button.
+
+
+* **Slash Commands:**
+* `/fc` - Toggle the main window.
+* `/fc debug` - Shows ItemID and ClassID of the item under your mouse cursor (useful for reporting missing items).
+
+
+
+---
+
+### 🌍 Supported Languages
+
+FarmCounter automatically detects your WoW client language:
+
+* 🇺🇸 English
+* 🇩🇪 German (Deutsch)
+* 🇫🇷 French (Français)
+* 🇪🇸 Spanish (Español)
+* 🇮🇹 Italian (Italiano)
+
+---
+
+*Simple. Efficient. Essential.*
+**Download FarmCounter today and optimize your farming!**
