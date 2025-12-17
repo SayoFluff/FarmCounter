@@ -6,7 +6,7 @@
 
 * **All-in-One Tracking:** Automatically detects and counts items in your bags based on category (Ores, Herbs, Leather, Wood, Enchanting, Cooking).
 * **Dynamic Visual Feedback:** The window border changes color based on your active filter, so you always know what you are tracking at a glance.
-* **Housing Ready:** Fully supports the new **Housing Materials** (Wood, Parts & Materials), including specific items like *Aschenholz/Ashwood*.
+* **Housing Ready:** Fully supports the new **Housing Materials** (Wood, Parts & Materials), including specific items like *Ashwood*.
 * **Smart Memory:** Window position, size, and active filters are saved **separately for each character**.
 * **Multi-Language:** Fully localized in English, German, French, Spanish, and Italian.
 
