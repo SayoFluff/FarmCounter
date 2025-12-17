@@ -1,5 +1,5 @@
 -- ============================================================================
--- FARMCOUNTER 4.0 - Persistence Update (Save State & Position)
+-- FARMCOUNTER 5.1 - Quality of Life Update
 -- ============================================================================
 
 local addonName, addonTable = ...
@@ -15,22 +15,26 @@ local EXPANSION_NAMES = {
 }
 
 -- Filter Konstanten
-local FILTER_ALL = 1
-local FILTER_ORES = 2
-local FILTER_HERBS = 3
-local FILTER_SKINNING = 4
-local FILTER_HOUSING = 5
+local FILTER_ALL        = 1
+local FILTER_ORES       = 2
+local FILTER_HERBS      = 3
+local FILTER_SKINNING   = 4
+local FILTER_HOUSING    = 5
+local FILTER_ENCHANTING = 6
+local FILTER_COOKING    = 7
 
 -- Farben für die Rahmen
 local BORDER_COLORS = {
-    [FILTER_ALL]      = {1.0, 0.85, 0.0}, -- Gold
-    [FILTER_ORES]     = {1.0, 0.3, 0.2},  -- Rot
-    [FILTER_HERBS]    = {0.2, 1.0, 0.2},  -- Grün
-    [FILTER_SKINNING] = {0.6, 0.4, 0.2},  -- Braun
-    [FILTER_HOUSING]  = {0.0, 0.7, 1.0}   -- Blau
+    [FILTER_ALL]        = {1.0, 0.85, 0.0}, -- Gold
+    [FILTER_ORES]       = {1.0, 0.3, 0.2},  -- Rot
+    [FILTER_HERBS]      = {0.2, 1.0, 0.2},  -- Grün
+    [FILTER_SKINNING]   = {0.6, 0.4, 0.2},  -- Braun
+    [FILTER_HOUSING]    = {0.0, 0.7, 1.0},  -- Blau
+    [FILTER_ENCHANTING] = {0.8, 0.4, 1.0},  -- Violett
+    [FILTER_COOKING]    = {1.0, 0.5, 0.0}   -- Orange
 }
 
-local db -- Datenbank Referenz
+local db
 local collapsedGroups = {}
 local itemRows = {}
 local headerRows = {}
@@ -46,14 +50,14 @@ FarmFrame:EnableMouse(true)
 FarmFrame:SetClampedToScreen(true)
 FarmFrame:SetResizable(true)
 FarmFrame:SetResizeBounds(250, 200, 800, 1000)
-FarmFrame:Hide() -- Standardmäßig versteckt, wird beim Laden geprüft
+FarmFrame:Hide()
 
 -- Hintergrund
 FarmFrame.bg = FarmFrame:CreateTexture(nil, "BACKGROUND")
 FarmFrame.bg:SetAllPoints()
 FarmFrame.bg:SetColorTexture(0.05, 0.05, 0.05, 0.85)
 
--- Rahmen speichern
+-- Rahmen
 FarmFrame.borderLines = {}
 local function CreateLine(point, relativePoint, x, y, w, h)
     local l = FarmFrame:CreateTexture(nil, "BORDER")
@@ -78,18 +82,14 @@ TitleBar.text = TitleBar:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
 TitleBar.text:SetPoint("CENTER"); TitleBar.text:SetText("FarmCounter")
 TitleBar.text:SetTextColor(1, 0.8, 0.4)
 
--- Dragging Logik (Speichert Position)
+-- Dragging
 TitleBar:EnableMouse(true)
 TitleBar:RegisterForDrag("LeftButton")
 TitleBar:SetScript("OnDragStart", function() FarmFrame:StartMoving() end)
 TitleBar:SetScript("OnDragStop", function() 
     FarmFrame:StopMovingOrSizing()
-    -- Position speichern
     local point, _, relativePoint, x, y = FarmFrame:GetPoint()
-    db.point = point
-    db.relativePoint = relativePoint
-    db.x = x
-    db.y = y
+    db.point = point; db.relativePoint = relativePoint; db.x = x; db.y = y
 end)
 
 -- Schließen
@@ -97,7 +97,7 @@ local CloseBtn = CreateFrame("Button", nil, TitleBar, "UIPanelCloseButton")
 CloseBtn:SetPoint("RIGHT", -2, 0)
 CloseBtn:SetScript("OnClick", function() FarmFrame:Hide() end)
 
--- Resizing Logik (Speichert Größe)
+-- Resizing
 local ResizeBtn = CreateFrame("Button", nil, FarmFrame)
 ResizeBtn:SetSize(16, 16)
 ResizeBtn:SetPoint("BOTTOMRIGHT", -2, 2)
@@ -107,9 +107,7 @@ ResizeBtn:SetPushedTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Down")
 ResizeBtn:SetScript("OnMouseDown", function() FarmFrame:StartSizing("BOTTOMRIGHT") end)
 ResizeBtn:SetScript("OnMouseUp", function() 
     FarmFrame:StopMovingOrSizing()
-    -- Größe speichern
-    db.width = FarmFrame:GetWidth()
-    db.height = FarmFrame:GetHeight()
+    db.width = FarmFrame:GetWidth(); db.height = FarmFrame:GetHeight()
 end)
 
 -- Scroll Bereich
@@ -121,14 +119,8 @@ Content:SetSize(1, 1)
 ScrollFrame:SetScrollChild(Content)
 ScrollFrame:SetScript("OnSizeChanged", function(self) Content:SetWidth(self:GetWidth()) end)
 
--- Sichtbarkeit speichern
-FarmFrame:SetScript("OnShow", function() 
-    if db then db.isVisible = true end
-    UpdateFarmList()
-end)
-FarmFrame:SetScript("OnHide", function() 
-    if db then db.isVisible = false end
-end)
+FarmFrame:SetScript("OnShow", function() if db then db.isVisible = true end; UpdateFarmList() end)
+FarmFrame:SetScript("OnHide", function() if db then db.isVisible = false end end)
 
 -- ----------------------------------------------------------------------------
 -- 3. Logik: Farben & Filter
@@ -143,16 +135,18 @@ end
 
 local function GetFilterName(mode)
     if mode == FILTER_ALL then return "Alles (Gesamt)" end
-    if mode == FILTER_ORES then return "Nur Erze" end
+    if mode == FILTER_ORES then return "Nur Erze & Steine" end
     if mode == FILTER_HERBS then return "Nur Kräuter" end
     if mode == FILTER_SKINNING then return "Leder & Stoffe" end
     if mode == FILTER_HOUSING then return "Hölzer & Mat." end
+    if mode == FILTER_ENCHANTING then return "Verzauberkunst" end
+    if mode == FILTER_COOKING then return "Fleisch & Fisch" end
     return "Unbekannt"
 end
 
 local function ToggleFilter()
     db.filterMode = db.filterMode + 1
-    if db.filterMode > 5 then db.filterMode = 1 end
+    if db.filterMode > 7 then db.filterMode = 1 end
     UpdateMinimapIcon()
     UpdateBorderColor()
     UpdateFarmList()
@@ -160,17 +154,28 @@ local function ToggleFilter()
 end
 
 -- ----------------------------------------------------------------------------
--- 4. Minimap Button
+-- 4. Minimap Button (ICONS)
 -- ----------------------------------------------------------------------------
 local minimapBtn, minimapIcon
 
 UpdateMinimapIcon = function()
     if not minimapIcon then return end
-    if db.filterMode == FILTER_ORES then minimapIcon:SetTexture("Interface\\Icons\\inv_ore_copper_01")
-    elseif db.filterMode == FILTER_HERBS then minimapIcon:SetTexture("Interface\\Icons\\inv_misc_herb_dreamfoil")
-    elseif db.filterMode == FILTER_SKINNING then minimapIcon:SetTexture("Interface\\Icons\\inv_misc_leatherscrap_02")
-    elseif db.filterMode == FILTER_HOUSING then minimapIcon:SetTexture("Interface\\Icons\\inv_tradeskillitem_01")
-    else minimapIcon:SetTexture("Interface\\Icons\\inv_misc_bag_10") end
+    
+    if db.filterMode == FILTER_ORES then 
+        minimapIcon:SetTexture("Interface\\Icons\\inv_pick_02")
+    elseif db.filterMode == FILTER_HERBS then 
+        minimapIcon:SetTexture("Interface\\Icons\\inv_misc_flower_02")
+    elseif db.filterMode == FILTER_SKINNING then 
+        minimapIcon:SetTexture("Interface\\Icons\\inv_misc_leatherscrap_08")
+    elseif db.filterMode == FILTER_HOUSING then 
+        minimapIcon:SetTexture("Interface\\Icons\\inv_tradeskillitem_03")
+    elseif db.filterMode == FILTER_ENCHANTING then 
+        minimapIcon:SetTexture("Interface\\Icons\\inv_enchant_duststrange")
+    elseif db.filterMode == FILTER_COOKING then 
+        minimapIcon:SetTexture("Interface\\Icons\\inv_misc_food_15")
+    else 
+        minimapIcon:SetTexture("Interface\\Icons\\inv_misc_bag_08")
+    end
 end
 
 local function InitMinimapButton()
@@ -214,7 +219,7 @@ local function InitMinimapButton()
     
     minimapBtn:SetScript("OnEnter", function(self)
         GameTooltip:SetOwner(self, "ANCHOR_LEFT")
-        GameTooltip:AddLine("FarmCounter 4.0")
+        GameTooltip:AddLine("FarmCounter 5.7")
         local c = BORDER_COLORS[db.filterMode or 1]
         GameTooltip:AddDoubleLine("Filter:", GetFilterName(db.filterMode), 1, 1, 1, c[1], c[2], c[3])
         GameTooltip:Show()
@@ -270,12 +275,19 @@ UpdateFarmList = function()
                     local isCloth = (subClassID == 5)
                     local isLeather = (subClassID == 6)
                     local isWood = (subClassID == 1 or subClassID == 11 or subClassID == 13) 
+                    local isEnchanting = (subClassID == 12)
+                    local isCooking = (subClassID == 8)
+
                     local shouldAdd = false
-                    if currentFilter == FILTER_ALL then if isOre or isHerb or isCloth or isLeather or isWood then shouldAdd = true end
+                    
+                    if currentFilter == FILTER_ALL then 
+                        if isOre or isHerb or isCloth or isLeather or isWood or isEnchanting or isCooking then shouldAdd = true end
                     elseif currentFilter == FILTER_ORES then if isOre then shouldAdd = true end
                     elseif currentFilter == FILTER_HERBS then if isHerb then shouldAdd = true end
                     elseif currentFilter == FILTER_SKINNING then if isCloth or isLeather then shouldAdd = true end
-                    elseif currentFilter == FILTER_HOUSING then if isWood then shouldAdd = true end end
+                    elseif currentFilter == FILTER_HOUSING then if isWood then shouldAdd = true end
+                    elseif currentFilter == FILTER_ENCHANTING then if isEnchanting then shouldAdd = true end
+                    elseif currentFilter == FILTER_COOKING then if isCooking then shouldAdd = true end end
 
                     if shouldAdd then items[info.itemID] = (items[info.itemID] or 0) + info.stackCount; foundItems = true end
                 end
@@ -341,39 +353,29 @@ end
 -- ----------------------------------------------------------------------------
 FarmFrame:SetScript("OnEvent", function(self, event, arg1)
     if event == "ADDON_LOADED" and arg1 == addonName then
-        -- 1. Datenbank Defaults setzen
         if not FarmCounterDB then FarmCounterDB = {} end
         db = FarmCounterDB
         
-        -- Default Werte falls Schlüssel fehlen
         if not db.minimapPos then db.minimapPos = 45 end
         if not db.filterMode then db.filterMode = 1 end
         if not db.width then db.width = 340 end
         if not db.height then db.height = 520 end
         if db.isVisible == nil then db.isVisible = false end
 
-        -- 2. Layout Wiederherstellen (Position & Größe)
         FarmFrame:SetSize(db.width, db.height)
         if db.point and db.x and db.y then
             FarmFrame:ClearAllPoints()
-            -- relativePoint fallback, falls nil
             FarmFrame:SetPoint(db.point, UIParent, db.relativePoint or "CENTER", db.x, db.y)
         else
-            FarmFrame:SetPoint("CENTER") -- Erster Start
+            FarmFrame:SetPoint("CENTER")
         end
 
-        -- 3. Komponenten Initialisieren
         InitMinimapButton()
         UpdateBorderColor()
 
-        -- 4. Sichtbarkeit Wiederherstellen
-        if db.isVisible then
-            FarmFrame:Show()
-        else
-            FarmFrame:Hide()
-        end
+        if db.isVisible then FarmFrame:Show() else FarmFrame:Hide() end
 
-        print("|cFF00FF00FarmCounter 4.0|r geladen.")
+        print("|cFF00FF00FarmCounter 5.7|r geladen.")
     elseif event == "BAG_UPDATE" and self:IsShown() then
         UpdateFarmList()
     elseif event == "GET_ITEM_INFO_RECEIVED" then
@@ -382,7 +384,7 @@ FarmFrame:SetScript("OnEvent", function(self, event, arg1)
 end)
 FarmFrame:RegisterEvent("ADDON_LOADED")
 FarmFrame:RegisterEvent("BAG_UPDATE")
--- Slash Commands
+
 SLASH_FARMCOUNTER1 = "/fc"
 SlashCmdList["FARMCOUNTER"] = function(msg)
     if msg == "debug" then print("Debug: Mouseover Item.")

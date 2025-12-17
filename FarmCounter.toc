@@ -1,8 +1,8 @@
 ## Interface: 110002
 ## Title: FarmCounter
-## Notes: All-in-One Tracker mit Speicherfunktion (Position, Größe, Filter).
+## Notes: Der ultimative Tracker: Erze, Kräuter, Leder, Housing, VZ & Kochen.
 ## Author: Sayo-Flufftiger
-## Version: 4.0
-## SavedVariables: FarmCounterDB
+## Version: 5.1
+## SavedVariablesPerCharacter: FarmCounterDB
 
 FarmCounter.lua
