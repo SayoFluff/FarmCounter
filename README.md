@@ -59,7 +59,7 @@ FarmCounter automatically detects your WoW client language:
 * 🇫🇷 French (Français)
 * 🇪🇸 Spanish (Español)
 * 🇮🇹 Italian (Italiano)
-
+* 🇷🇺 Russian (Русский)
 ---
 
 *Simple. Efficient. Essential.*
