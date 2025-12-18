@@ -191,9 +191,24 @@ local function GetItemRow(i)
     if not itemRows[i] then
         local r = CreateFrame("Button", nil, Content)
         r:SetHeight(20); r:SetPoint("LEFT", 10, 0); r:SetPoint("RIGHT", -5, 0)
-        r.icon = r:CreateTexture(nil, "ARTWORK"); r.icon:SetSize(16, 16); r.icon:SetPoint("LEFT", 0, 0)
-        r.count = r:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall"); r.count:SetPoint("LEFT", r.icon, "RIGHT", 5, 0); r.count:SetWidth(80); r.count:SetJustifyH("RIGHT")
-        r.name = r:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall"); r.name:SetPoint("LEFT", r.count, "RIGHT", 10, 0); r.name:SetPoint("RIGHT", r, "RIGHT", 0, 0); r.name:SetJustifyH("LEFT")
+        
+        -- 1. ICON (Links)
+        r.icon = r:CreateTexture(nil, "ARTWORK")
+        r.icon:SetSize(16, 16)
+        r.icon:SetPoint("LEFT", 0, 0)
+        
+        -- 2. ANZAHL (Ganz Rechts angepinnt)
+        r.count = r:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+        r.count:SetPoint("RIGHT", r, "RIGHT", -5, 0) -- Rechtsbündig am Rand
+        r.count:SetJustifyH("RIGHT")
+        -- Keine feste Breite mehr nötig, da rechts verankert
+        
+        -- 3. NAME (Füllt den Platz dazwischen)
+        r.name = r:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+        r.name:SetPoint("LEFT", r.icon, "RIGHT", 5, 0) -- Startet direkt am Icon
+        r.name:SetPoint("RIGHT", r.count, "LEFT", -5, 0) -- Endet vor der Zahl
+        r.name:SetJustifyH("LEFT")
+        r.name:SetWordWrap(false) -- Text abschneiden, falls zu lang
         
         -- CLICK HANDLER
         r:RegisterForClicks("LeftButtonUp", "RightButtonUp")
