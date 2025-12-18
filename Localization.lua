@@ -16,6 +16,7 @@ L["GOAL_COMPLETED"] = "Goal Reached: %s!"
 L["GOAL_REMOVED"] = "Goal removed for: %s"
 L["TOOLTIP_HINT_ITEM_GOAL"] = "|cFF00FF00Left Click:|r Set Goal\n|cFFFF0000Right Click:|r Remove Goal"
 
+-- Cleaned up names
 L["FILTER_ALL"] = "All (Summary)"
 L["FILTER_ORES"] = "Ores & Stone"
 L["FILTER_HERBS"] = "Herbs"
@@ -27,8 +28,8 @@ L["FILTER_ELEMENTAL"] = "Elementals"
 L["FILTER_GEMS"] = "Gems"
 
 L["TOOLTIP_HINT_LEFT"] = "Left Click: Open/Close"
-L["TOOLTIP_HINT_SHIFT"] = "Shift + Click: Change Filter"
-L["TOOLTIP_HINT_RIGHT"] = "Right Click: Move Button"
+L["TOOLTIP_HINT_MENU"] = "Right Click: Select Filter"
+L["TOOLTIP_HINT_DRAG"] = "Right Click + Drag: Move Button"
 
 L["EXP_0"] = "Classic"; L["EXP_1"] = "The Burning Crusade"; L["EXP_2"] = "Wrath of the Lich King"
 L["EXP_3"] = "Cataclysm"; L["EXP_4"] = "Mists of Pandaria"; L["EXP_5"] = "Warlords of Draenor"
@@ -51,19 +52,20 @@ if GetLocale() == "deDE" then
     L["GOAL_REMOVED"] = "Ziel entfernt für: %s"
     L["TOOLTIP_HINT_ITEM_GOAL"] = "|cFF00FF00Linksklick:|r Ziel setzen\n|cFFFF0000Rechtsklick:|r Ziel löschen"
 
+    -- Bereinigte Gruppennamen ("Nur" entfernt, "Mat." ausgeschrieben)
     L["FILTER_ALL"] = "Alles (Gesamt)"
-    L["FILTER_ORES"] = "Nur Erze & Steine"
-    L["FILTER_HERBS"] = "Nur Kräuter"
+    L["FILTER_ORES"] = "Erze & Steine"       -- Vorher: "Nur Erze..."
+    L["FILTER_HERBS"] = "Kräuter"            -- Vorher: "Nur Kräuter"
     L["FILTER_SKINNING"] = "Leder & Stoffe"
-    L["FILTER_HOUSING"] = "Hölzer & Mat."
+    L["FILTER_HOUSING"] = "Hölzer & Teile"   -- Vorher: "Hölzer & Mat." (sieht so besser aus)
     L["FILTER_ENCHANTING"] = "Verzauberkunst"
     L["FILTER_COOKING"] = "Fleisch & Fisch"
     L["FILTER_ELEMENTAL"] = "Elementare"
     L["FILTER_GEMS"] = "Edelsteine"
 
     L["TOOLTIP_HINT_LEFT"] = "Links: Öffnen/Schließen"
-    L["TOOLTIP_HINT_SHIFT"] = "Shift + Klick: Filter ändern"
-    L["TOOLTIP_HINT_RIGHT"] = "Rechts: Button verschieben"
+    L["TOOLTIP_HINT_MENU"] = "Rechts: Filter auswählen"
+    L["TOOLTIP_HINT_DRAG"] = "Rechts + Ziehen: Verschieben"
 end
 
 -- ============================================================================
@@ -91,8 +93,8 @@ if GetLocale() == "frFR" then
     L["FILTER_GEMS"] = "Gemmes"
 
     L["TOOLTIP_HINT_LEFT"] = "Clic Gauche: Ouvrir/Fermer"
-    L["TOOLTIP_HINT_SHIFT"] = "Shift + Clic: Changer Filtre"
-    L["TOOLTIP_HINT_RIGHT"] = "Clic Droit: Déplacer"
+    L["TOOLTIP_HINT_MENU"] = "Clic Droit: Choisir un filtre"
+    L["TOOLTIP_HINT_DRAG"] = "Clic Droit + Glisser: Déplacer"
 end
 
 -- ============================================================================
@@ -120,8 +122,8 @@ if GetLocale() == "esES" or GetLocale() == "esMX" then
     L["FILTER_GEMS"] = "Gemas"
 
     L["TOOLTIP_HINT_LEFT"] = "Clic Izquierdo: Abrir/Cerrar"
-    L["TOOLTIP_HINT_SHIFT"] = "Mayús + Clic: Cambiar Filtro"
-    L["TOOLTIP_HINT_RIGHT"] = "Clic Derecho: Mover"
+    L["TOOLTIP_HINT_MENU"] = "Clic Der: Seleccionar filtro"
+    L["TOOLTIP_HINT_DRAG"] = "Clic Der + Arrastrar: Mover"
 end
 
 -- ============================================================================
@@ -149,8 +151,8 @@ if GetLocale() == "itIT" then
     L["FILTER_GEMS"] = "Gemme"
 
     L["TOOLTIP_HINT_LEFT"] = "Clic Sinistro: Apri/Chiudi"
-    L["TOOLTIP_HINT_SHIFT"] = "Maiusc + Clic: Cambia Filtro"
-    L["TOOLTIP_HINT_RIGHT"] = "Clic Destro: Sposta"
+    L["TOOLTIP_HINT_MENU"] = "Clic Destro: Seleziona filtro"
+    L["TOOLTIP_HINT_DRAG"] = "Clic Destro + Trascinare: Sposta"
 end
 
 -- ============================================================================
@@ -179,8 +181,8 @@ if GetLocale() == "ruRU" then
     L["FILTER_GEMS"] = "Самоцветы"
 
     L["TOOLTIP_HINT_LEFT"] = "ЛКМ: Открыть/Закрыть"
-    L["TOOLTIP_HINT_SHIFT"] = "Shift + Клик: Сменить фильтр"
-    L["TOOLTIP_HINT_RIGHT"] = "ПКМ: Переместить кнопку"
+    L["TOOLTIP_HINT_MENU"] = "ПКМ: Выбрать фильтр"
+    L["TOOLTIP_HINT_DRAG"] = "ПКМ + Тащить: Переместить"
 end
 
 addonTable.L = L

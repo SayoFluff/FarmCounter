@@ -1,5 +1,5 @@
 -- ============================================================================
--- FARMCOUNTER 7.1 - New Filters (Elements & Gems)
+-- FARMCOUNTER 7.2 - Changed Filterlogic / added Menu
 -- ============================================================================
 
 local addonName, addonTable = ...
@@ -8,6 +8,11 @@ local L = addonTable.L
 local FILTER_ALL = 1; local FILTER_ORES = 2; local FILTER_HERBS = 3
 local FILTER_SKINNING = 4; local FILTER_HOUSING = 5; local FILTER_ENCHANTING = 6
 local FILTER_COOKING = 7; local FILTER_ELEMENTAL = 8; local FILTER_GEMS = 9
+
+-- Helper to convert RGB table to Hex string for Menu
+local function RGBToHex(r, g, b)
+    return string.format("|cFF%02x%02x%02x", r*255, g*255, b*255)
+end
 
 local BORDER_COLORS = {
     [FILTER_ALL] = {1.0, 0.85, 0.0},        -- Gold
@@ -25,7 +30,6 @@ local db
 local collapsedGroups = {}
 local itemRows = {}
 local headerRows = {}
--- Session Table to prevent sound spam
 local sessionGoalMet = {} 
 
 local UpdateFarmList, UpdateMinimapIcon, UpdateBorderColor
@@ -35,47 +39,26 @@ local UpdateFarmList, UpdateMinimapIcon, UpdateBorderColor
 -- ----------------------------------------------------------------------------
 StaticPopupDialogs["FARMCOUNTER_SET_GOAL"] = {
     text = L["GOAL_POPUP_TEXT"],
-    button1 = ACCEPT,
-    button2 = CANCEL,
-    hasEditBox = true,
-    maxLetters = 5,
+    button1 = ACCEPT, button2 = CANCEL, hasEditBox = true, maxLetters = 5,
     OnShow = function(self, data)
         self.EditBox:SetNumeric(true)
-        if data.currentGoal and data.currentGoal > 0 then
-            self.EditBox:SetText(data.currentGoal)
-        end
+        if data.currentGoal and data.currentGoal > 0 then self.EditBox:SetText(data.currentGoal) end
         self.EditBox:SetFocus()
     end,
     OnAccept = function(self, data)
-        local text = self.EditBox:GetText()
-        local value = tonumber(text) or 0
-        
+        local value = tonumber(self.EditBox:GetText()) or 0
         if not db.goals then db.goals = {} end
-        
-        if value > 0 then
-            db.goals[data.itemID] = value
-            print("|cFF00FF00FarmCounter:|r " .. string.format(L["GOAL_SET"], data.itemName, value))
-        else
-            db.goals[data.itemID] = nil
-            print("|cFF00FF00FarmCounter:|r " .. string.format(L["GOAL_REMOVED"], data.itemName))
-        end
-        sessionGoalMet[data.itemID] = false 
-        UpdateFarmList()
+        if value > 0 then db.goals[data.itemID] = value; print("|cFF00FF00FarmCounter:|r " .. string.format(L["GOAL_SET"], data.itemName, value))
+        else db.goals[data.itemID] = nil; print("|cFF00FF00FarmCounter:|r " .. string.format(L["GOAL_REMOVED"], data.itemName)) end
+        sessionGoalMet[data.itemID] = false; UpdateFarmList()
     end,
-    EditBoxOnEnterPressed = function(self)
-        local parent = self:GetParent()
-        StaticPopupDialogs["FARMCOUNTER_SET_GOAL"].OnAccept(parent, parent.data)
-        parent:Hide()
-    end,
+    EditBoxOnEnterPressed = function(self) local p = self:GetParent(); StaticPopupDialogs["FARMCOUNTER_SET_GOAL"].OnAccept(p, p.data); p:Hide() end,
     EditBoxOnEscapePressed = function(self) self:GetParent():Hide() end,
-    timeout = 0,
-    whileDead = true,
-    hideOnEscape = true,
-    preferredIndex = 3,
+    timeout = 0, whileDead = true, hideOnEscape = true, preferredIndex = 3,
 }
 
 -- ----------------------------------------------------------------------------
--- HAUPTFENSTER
+-- MAIN FRAME
 -- ----------------------------------------------------------------------------
 local FarmFrame = CreateFrame("Frame", "FarmCounterMainFrame", UIParent)
 FarmFrame:SetFrameStrata("HIGH"); FarmFrame:SetMovable(true); FarmFrame:EnableMouse(true)
@@ -87,12 +70,10 @@ FarmFrame.bg:SetAllPoints(); FarmFrame.bg:SetColorTexture(0.05, 0.05, 0.05, 0.85
 
 FarmFrame.borderLines = {}
 local function CreateLine(point, relativePoint, x, y, w, h)
-    local l = FarmFrame:CreateTexture(nil, "BORDER")
-    l:SetColorTexture(1, 0.85, 0, 1)
+    local l = FarmFrame:CreateTexture(nil, "BORDER"); l:SetColorTexture(1, 0.85, 0, 1)
     if w then l:SetWidth(w) else l:SetPoint("LEFT"); l:SetPoint("RIGHT") end
     if h then l:SetHeight(h) else l:SetPoint("TOP"); l:SetPoint("BOTTOM") end
-    l:SetPoint(point, FarmFrame, relativePoint, x, y)
-    table.insert(FarmFrame.borderLines, l)
+    l:SetPoint(point, FarmFrame, relativePoint, x, y); table.insert(FarmFrame.borderLines, l)
 end
 CreateLine("TOPLEFT", "TOPLEFT", 0, 0, nil, 2); CreateLine("BOTTOMLEFT", "BOTTOMLEFT", 0, 0, nil, 2)
 CreateLine("TOPLEFT", "TOPLEFT", 0, 0, 2, nil); CreateLine("TOPRIGHT", "TOPRIGHT", 0, 0, 2, nil)
@@ -102,21 +83,14 @@ TitleBar:SetHeight(30); TitleBar:SetPoint("TOPLEFT", 2, -2); TitleBar:SetPoint("
 TitleBar.bg = TitleBar:CreateTexture(nil, "BACKGROUND"); TitleBar.bg:SetAllPoints(); TitleBar.bg:SetColorTexture(0.2, 0.2, 0.2, 1)
 TitleBar.text = TitleBar:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
 TitleBar.text:SetPoint("CENTER"); TitleBar.text:SetText(L["TITLE"]); TitleBar.text:SetTextColor(1, 0.8, 0.4)
-
 TitleBar:EnableMouse(true); TitleBar:RegisterForDrag("LeftButton")
 TitleBar:SetScript("OnDragStart", function() FarmFrame:StartMoving() end)
-TitleBar:SetScript("OnDragStop", function() FarmFrame:StopMovingOrSizing()
-    local p, _, rp, x, y = FarmFrame:GetPoint(); db.point = p; db.relativePoint = rp; db.x = x; db.y = y end)
+TitleBar:SetScript("OnDragStop", function() FarmFrame:StopMovingOrSizing(); local p, _, rp, x, y = FarmFrame:GetPoint(); db.point = p; db.relativePoint = rp; db.x = x; db.y = y end)
 
-local CloseBtn = CreateFrame("Button", nil, TitleBar, "UIPanelCloseButton"); CloseBtn:SetPoint("RIGHT", -2, 0)
-CloseBtn:SetScript("OnClick", function() FarmFrame:Hide() end)
-
+local CloseBtn = CreateFrame("Button", nil, TitleBar, "UIPanelCloseButton"); CloseBtn:SetPoint("RIGHT", -2, 0); CloseBtn:SetScript("OnClick", function() FarmFrame:Hide() end)
 local ResizeBtn = CreateFrame("Button", nil, FarmFrame); ResizeBtn:SetSize(16, 16); ResizeBtn:SetPoint("BOTTOMRIGHT", -2, 2)
-ResizeBtn:SetNormalTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
-ResizeBtn:SetHighlightTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Highlight")
-ResizeBtn:SetPushedTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Down")
-ResizeBtn:SetScript("OnMouseDown", function() FarmFrame:StartSizing("BOTTOMRIGHT") end)
-ResizeBtn:SetScript("OnMouseUp", function() FarmFrame:StopMovingOrSizing() db.width = FarmFrame:GetWidth(); db.height = FarmFrame:GetHeight() end)
+ResizeBtn:SetNormalTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up"); ResizeBtn:SetScript("OnMouseDown", function() FarmFrame:StartSizing("BOTTOMRIGHT") end)
+ResizeBtn:SetScript("OnMouseUp", function() FarmFrame:StopMovingOrSizing(); db.width = FarmFrame:GetWidth(); db.height = FarmFrame:GetHeight() end)
 
 local ScrollFrame = CreateFrame("ScrollFrame", nil, FarmFrame, "UIPanelScrollFrameTemplate")
 ScrollFrame:SetPoint("TOPLEFT", 10, -40); ScrollFrame:SetPoint("BOTTOMRIGHT", -30, 25)
@@ -144,10 +118,9 @@ local function GetFilterName(mode)
     return "Unknown"
 end
 
-local function ToggleFilter()
-    db.filterMode = db.filterMode + 1; if db.filterMode > 9 then db.filterMode = 1 end
+local function SetFilter(mode)
+    db.filterMode = mode
     UpdateMinimapIcon(); UpdateBorderColor(); UpdateFarmList()
-    print("|cFF00FF00FarmCounter:|r " .. L["FILTER_CHANGE"] .. " " .. GetFilterName(db.filterMode))
 end
 
 local minimapBtn, minimapIcon
@@ -164,6 +137,26 @@ UpdateMinimapIcon = function()
     else minimapIcon:SetTexture("Interface\\Icons\\inv_misc_bag_08") end
 end
 
+-- ============================================================================
+-- NEW MENU UTIL (Replaces deprecated EasyMenu)
+-- ============================================================================
+local function OpenFilterMenu(owner)
+    MenuUtil.CreateContextMenu(owner, function(owner, root)
+        root:CreateTitle(L["TITLE"] .. " " .. L["FILTER_CHANGE"])
+        
+        for i = 1, 9 do
+            local c = BORDER_COLORS[i]
+            local hex = RGBToHex(c[1], c[2], c[3])
+            local text = hex .. GetFilterName(i) .. "|r"
+            
+            root:CreateCheckbox(text, 
+                function() return db.filterMode == i end, 
+                function() SetFilter(i) end
+            )
+        end
+    end)
+end
+
 local function InitMinimapButton()
     minimapBtn = CreateFrame("Button", "FarmCounterMinimapButton", Minimap)
     minimapBtn:SetFrameStrata("MEDIUM"); minimapBtn:SetSize(31, 31); minimapBtn:SetFrameLevel(8)
@@ -177,19 +170,36 @@ local function InitMinimapButton()
         minimapBtn:SetPoint("CENTER", Minimap, "CENTER", x, y)
     end
     UpdatePos()
-    minimapBtn:RegisterForDrag("RightButton"); minimapBtn:SetMovable(true)
-    minimapBtn:SetScript("OnDragStart", function() minimapBtn:SetScript("OnUpdate", function()
-        local mx, my = Minimap:GetCenter(); local cx, cy = GetCursorPosition(); local s = Minimap:GetEffectiveScale()
-        db.minimapPos = math.deg(math.atan2((cy/s)-my, (cx/s)-mx)); UpdatePos()
-    end) end)
+    
+    minimapBtn:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+    minimapBtn:RegisterForDrag("RightButton")
+    minimapBtn:SetMovable(true)
+    
+    minimapBtn:SetScript("OnDragStart", function()
+        minimapBtn:SetScript("OnUpdate", function()
+            local mx, my = Minimap:GetCenter(); local cx, cy = GetCursorPosition(); local s = Minimap:GetEffectiveScale()
+            db.minimapPos = math.deg(math.atan2((cy/s)-my, (cx/s)-mx)); UpdatePos()
+        end)
+    end)
     minimapBtn:SetScript("OnDragStop", function() minimapBtn:SetScript("OnUpdate", nil) end)
-    minimapBtn:SetScript("OnClick", function(self, b) if b == "LeftButton" then if IsShiftKeyDown() then ToggleFilter() else if FarmFrame:IsShown() then FarmFrame:Hide() else FarmFrame:Show() end end end end)
+    
+    minimapBtn:SetScript("OnClick", function(self, b)
+        if b == "LeftButton" then
+            if FarmFrame:IsShown() then FarmFrame:Hide() else FarmFrame:Show() end
+        elseif b == "RightButton" then
+            OpenFilterMenu(self) -- Passing SELF is critical for MenuUtil!
+        end
+    end)
+    
     minimapBtn:SetScript("OnEnter", function(self)
-        GameTooltip:SetOwner(self, "ANCHOR_LEFT"); GameTooltip:AddLine(L["TITLE"].." 7.1")
-        GameTooltip:AddLine(L["TOOLTIP_HINT_LEFT"], 1, 1, 1); GameTooltip:AddLine(L["TOOLTIP_HINT_SHIFT"], 0, 1, 0)
-        GameTooltip:AddLine(L["TOOLTIP_HINT_RIGHT"], 0.7, 0.7, 0.7); GameTooltip:AddLine(" ")
+        GameTooltip:SetOwner(self, "ANCHOR_LEFT"); GameTooltip:AddLine(L["TITLE"].." 7.2")
+        GameTooltip:AddLine(L["TOOLTIP_HINT_LEFT"], 1, 1, 1)
+        GameTooltip:AddLine(L["TOOLTIP_HINT_MENU"], 1, 0.82, 0)
+        GameTooltip:AddLine(L["TOOLTIP_HINT_DRAG"], 0.7, 0.7, 0.7)
+        GameTooltip:AddLine(" ")
         local c = BORDER_COLORS[db.filterMode or 1]
-        GameTooltip:AddDoubleLine(L["FILTER_CHANGE"], GetFilterName(db.filterMode), 1, 1, 1, c[1], c[2], c[3]); GameTooltip:Show()
+        GameTooltip:AddDoubleLine(L["FILTER_CHANGE"], GetFilterName(db.filterMode), 1, 1, 1, c[1], c[2], c[3])
+        GameTooltip:Show()
     end)
     minimapBtn:SetScript("OnLeave", function() GameTooltip:Hide() end)
 end
@@ -230,10 +240,9 @@ local function GetHeaderRow(i)
 end
 
 -- ============================================================================
--- CORE LOGIC - Background Alerting & New Filters
+-- CORE LOGIC
 -- ============================================================================
 UpdateFarmList = function()
-    -- 1. IMMER TASCHEN SCANNEN (Egal ob Fenster offen oder zu)
     local items = {}; local found = false; local mode = db.filterMode or FILTER_ALL
     for bag = 0, 5 do
         for slot = 1, C_Container.GetContainerNumSlots(bag) do
@@ -246,8 +255,7 @@ UpdateFarmList = function()
                     local isSkin = (sub == 5 or sub == 6)
                     local isWood = (sub == 1 or sub == 11 or sub == 13)
                     local isEnch = (sub == 12); local isCook = (sub == 8)
-                    local isElem = (sub == 10)
-                    local isGem = (sub == 4)
+                    local isElem = (sub == 10); local isGem = (sub == 4)
 
                     if mode == FILTER_ALL then 
                         if isOre or isHerb or isSkin or isWood or isEnch or isCook or isElem or isGem then add = true end
@@ -267,7 +275,6 @@ UpdateFarmList = function()
         end
     end
 
-    -- 2. ALARM PRÜFUNG (Läuft auch im Hintergrund)
     if db.goals then
         for id, count in pairs(items) do
             local goal = db.goals[id]
@@ -280,16 +287,12 @@ UpdateFarmList = function()
                         print("|cFF00FF00FarmCounter:|r " .. string.format(L["GOAL_COMPLETED"], n))
                         sessionGoalMet[id] = true
                     end
-                else
-                    sessionGoalMet[id] = false
-                end
+                else sessionGoalMet[id] = false end
             end
         end
     end
 
-    -- 3. VISUALS ABBRECHEN, wenn Fenster zu
     if not FarmFrame:IsShown() then return end
-
     for _, r in pairs(itemRows) do r:Hide() end; for _, h in pairs(headerRows) do h:Hide() end
     if not found then local r = GetItemRow(1); r.icon:SetTexture(nil); r.count:SetText(""); r.name:SetText(L["NOTHING_FOUND"]); r:SetPoint("TOPLEFT", Content, "TOPLEFT", 0, 0); r:Show(); return end
     
@@ -316,12 +319,9 @@ UpdateFarmList = function()
                 r.icon:SetTexture(item.icon); r.name:SetText(item.name)
                 
                 local goal = (db.goals and db.goals[item.id]) or 0
-                if goal > 0 then
-                    r.count:SetText(item.count .. " / " .. goal)
+                if goal > 0 then r.count:SetText(item.count .. " / " .. goal)
                     if item.count >= goal then r.count:SetTextColor(0, 1, 0) else r.count:SetTextColor(1, 1, 1) end
-                else
-                    r.count:SetText(item.count); r.count:SetTextColor(1, 1, 1)
-                end
+                else r.count:SetText(item.count); r.count:SetTextColor(1, 1, 1) end
                 
                 local rc, gc, bc = C_Item.GetItemQualityColor(item.quality); r.name:SetTextColor(rc, gc, bc)
                 r:SetPoint("TOPLEFT", Content, "TOPLEFT", 0, y); r:Show(); y = y - 20; ri = ri + 1
@@ -340,35 +340,19 @@ FarmFrame:SetScript("OnEvent", function(self, event, arg1)
         if not db.width then db.width = 340 end; if not db.height then db.height = 520 end
         if db.isVisible == nil then db.isVisible = false end
         if not db.goals then db.goals = {} end
-        
         FarmFrame:SetSize(db.width, db.height)
         if db.point then FarmFrame:ClearAllPoints(); FarmFrame:SetPoint(db.point, UIParent, db.relativePoint, db.x, db.y) else FarmFrame:SetPoint("CENTER") end
         InitMinimapButton(); UpdateBorderColor()
         if db.isVisible then FarmFrame:Show() else FarmFrame:Hide() end
-        print("|cFF00FF00FarmCounter 7.1|r " .. L["LOADED"])
-    
-    elseif event == "BAG_UPDATE" then 
-        UpdateFarmList()
-        
-    elseif event == "GET_ITEM_INFO_RECEIVED" then UpdateFarmList() end
+        print("|cFF00FF00FarmCounter 7.2|r " .. L["LOADED"])
+    elseif event == "BAG_UPDATE" or event == "GET_ITEM_INFO_RECEIVED" then UpdateFarmList() end
 end)
 FarmFrame:RegisterEvent("ADDON_LOADED"); FarmFrame:RegisterEvent("BAG_UPDATE")
 
 SLASH_FARMCOUNTER1 = "/fc"
 SlashCmdList["FARMCOUNTER"] = function(msg)
     if msg == "debug" then 
-        local _, link = GameTooltip:GetItem()
-        if link then
-            local itemID, _, _, _, _, classID, subClassID = C_Item.GetItemInfoInstant(link)
-            print("|cFF00FF00FarmCounter Debug:|r")
-            print("Item: " .. link)
-            print("ItemID: " .. (itemID or "Unknown"))
-            print("ClassID: " .. (classID or "Unknown") .. " (Must be 7)")
-            print("SubClassID: " .. (subClassID or "Unknown"))
-        else
-            print("|cFF00FF00FarmCounter:|r Mouseover an item to debug.")
-        end
-    else 
-        if FarmFrame:IsShown() then FarmFrame:Hide() else FarmFrame:Show() end 
-    end
+        local _, link = GameTooltip:GetItem(); if link then local itemID, _, _, _, _, classID, sub = C_Item.GetItemInfoInstant(link)
+        print("Item: "..link.." ID: "..(itemID or "?").." Class: "..(classID or "?").." Sub: "..(sub or "?")) else print("Mouseover item required.") end
+    else if FarmFrame:IsShown() then FarmFrame:Hide() else FarmFrame:Show() end end
 end
