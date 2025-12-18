@@ -177,7 +177,7 @@ if GetLocale() == "ruRU" then
     L["FILTER_HOUSING"] = "Древесина и детали"
     L["FILTER_ENCHANTING"] = "Зачарование"
     L["FILTER_COOKING"] = "Мясо и рыба"
-    L["FILTER_ELEMENTAL"] = "Элементали"
+    L["FILTER_ELEMENTAL"] = "Элементы"
     L["FILTER_GEMS"] = "Самоцветы"
 
     L["TOOLTIP_HINT_LEFT"] = "ЛКМ: Открыть/Закрыть"
