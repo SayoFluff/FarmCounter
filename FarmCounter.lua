@@ -158,31 +158,76 @@ end
 
 local function InitMinimapButton()
     minimapBtn = CreateFrame("Button", "FarmCounterMinimapButton", Minimap)
-    minimapBtn:SetFrameStrata("MEDIUM"); minimapBtn:SetSize(31, 31); minimapBtn:SetFrameLevel(8)
-    minimapIcon = minimapBtn:CreateTexture(nil, "BACKGROUND"); minimapIcon:SetSize(21, 21); minimapIcon:SetPoint("CENTER")
+    minimapBtn:SetFrameStrata("MEDIUM")
+    minimapBtn:SetSize(31, 31)
+    minimapBtn:SetFrameLevel(8)
+    
+    minimapIcon = minimapBtn:CreateTexture(nil, "BACKGROUND")
+    minimapIcon:SetSize(21, 21)
+    minimapIcon:SetPoint("CENTER")
+    
     local border = minimapBtn:CreateTexture(nil, "OVERLAY")
-    border:SetTexture("Interface\\Minimap\\MiniMap-TrackingBorder"); border:SetSize(53, 53); border:SetPoint("TOPLEFT")
+    border:SetTexture("Interface\\Minimap\\MiniMap-TrackingBorder")
+    border:SetSize(53, 53)
+    border:SetPoint("TOPLEFT")
+    
     UpdateMinimapIcon()
     
+    -- NEUE POSITIONS-LOGIK (Kreis-Mathematik)
     local function UpdatePos()
-        local a = math.rad(db.minimapPos or 45); local x = 52 - (80 * math.cos(a)); local y = (80 * math.sin(a)) - 52
-        minimapBtn:SetPoint("TOPLEFT", Minimap, "TOPLEFT", x, y)
+        local angle = math.rad(db.minimapPos or 45)
+        local radius = 80 -- Standard Radius der Minimap
+        
+        -- Wir berechnen die Position relativ zur MITTE (Center)
+        local x = math.cos(angle) * radius
+        local y = math.sin(angle) * radius
+        
+        minimapBtn:SetPoint("CENTER", Minimap, "CENTER", x, y)
     end
+    
     UpdatePos()
-    minimapBtn:RegisterForDrag("RightButton"); minimapBtn:SetMovable(true)
-    minimapBtn:SetScript("OnDragStart", function() minimapBtn:SetScript("OnUpdate", function()
-        local mx, my = Minimap:GetCenter(); local cx, cy = GetCursorPosition(); local s = Minimap:GetEffectiveScale()
-        db.minimapPos = math.deg(math.atan2((cy/s) - my, (cx/s) - mx)); UpdatePos()
-    end) end)
-    minimapBtn:SetScript("OnDragStop", function() minimapBtn:SetScript("OnUpdate", nil) end)
-    minimapBtn:SetScript("OnClick", function(self, b) if b == "LeftButton" then if IsShiftKeyDown() then ToggleFilter() else if FarmFrame:IsShown() then FarmFrame:Hide() else FarmFrame:Show() end end end end)
+
+    minimapBtn:RegisterForDrag("RightButton")
+    minimapBtn:SetMovable(true)
+    
+    minimapBtn:SetScript("OnDragStart", function()
+        minimapBtn:SetScript("OnUpdate", function()
+            local mx, my = Minimap:GetCenter()
+            local cx, cy = GetCursorPosition()
+            local scale = Minimap:GetEffectiveScale()
+            
+            -- Berechne den Winkel zwischen Maus und Minimap-Mitte
+            local dx = (cx / scale) - mx
+            local dy = (cy / scale) - my
+            
+            -- Speichere den Winkel
+            db.minimapPos = math.deg(math.atan2(dy, dx))
+            UpdatePos()
+        end)
+    end)
+    
+    minimapBtn:SetScript("OnDragStop", function()
+        minimapBtn:SetScript("OnUpdate", nil)
+    end)
+    
+    minimapBtn:SetScript("OnClick", function(self, b)
+        if b == "LeftButton" then
+            if IsShiftKeyDown() then ToggleFilter()
+            else if FarmFrame:IsShown() then FarmFrame:Hide() else FarmFrame:Show() end end
+        end
+    end)
+    
     minimapBtn:SetScript("OnEnter", function(self)
-        GameTooltip:SetOwner(self, "ANCHOR_LEFT"); GameTooltip:AddLine(L["TITLE"].." 7.2")
-        GameTooltip:AddLine(L["TOOLTIP_HINT_LEFT"], 1, 1, 1); GameTooltip:AddLine(L["TOOLTIP_HINT_SHIFT"], 0, 1, 0)
+        GameTooltip:SetOwner(self, "ANCHOR_LEFT")
+        GameTooltip:AddLine(L["TITLE"].." 7.2")
+        GameTooltip:AddLine(L["TOOLTIP_HINT_LEFT"], 1, 1, 1)
+        GameTooltip:AddLine(L["TOOLTIP_HINT_SHIFT"], 0, 1, 0)
         GameTooltip:AddLine(L["TOOLTIP_HINT_RIGHT"], 0.7, 0.7, 0.7)
         GameTooltip:AddLine(" ")
+        
         local c = BORDER_COLORS[db.filterMode or 1]
-        GameTooltip:AddDoubleLine(L["FILTER_CHANGE"], GetFilterName(db.filterMode), 1, 1, 1, c[1], c[2], c[3]); GameTooltip:Show()
+        GameTooltip:AddDoubleLine(L["FILTER_CHANGE"], GetFilterName(db.filterMode), 1, 1, 1, c[1], c[2], c[3])
+        GameTooltip:Show()
     end)
     minimapBtn:SetScript("OnLeave", function() GameTooltip:Hide() end)
 end
