@@ -142,5 +142,32 @@ if GetLocale() == "itIT" then
     L["TOOLTIP_HINT_SHIFT"] = "Maiusc + Clic: Cambia Filtro"
     L["TOOLTIP_HINT_RIGHT"] = "Clic Destro: Sposta"
 end
+-- ============================================================================
+-- 6. RUSSIAN (Translator: ZamestoTV)
+-- ============================================================================
+if GetLocale() == "ruRU" then
+    L["LOADED"] = "загружено. ЛКМ по предмету для настройки цели."
+    L["NOTHING_FOUND"] = "Предметы для этого фильтра не найдены."
+    L["LOADING"] = "Загрузка..."
+    L["FILTER_CHANGE"] = "Фильтр:"
 
+    -- New Goal System
+    L["GOAL_POPUP_TEXT"] = "Введите количество для:\n%s"
+    L["GOAL_SET"] = "Цель установлена для %s: %s"
+    L["GOAL_COMPLETED"] = "Цель достигнута: %s!"
+    L["GOAL_REMOVED"] = "Цель удалена для: %s"
+    L["TOOLTIP_HINT_ITEM_GOAL"] = "|cFF00FF00ЛКМ:|r Задать цель\n|cFFFF0000ПКМ:|r Удалить цель"
+
+    L["FILTER_ALL"] = "Все (Итог)"
+    L["FILTER_ORES"] = "Руды и камень"
+    L["FILTER_HERBS"] = "Травы"
+    L["FILTER_SKINNING"] = "Кожа и ткань"
+    L["FILTER_HOUSING"] = "Древесина и детали"
+    L["FILTER_ENCHANTING"] = "Зачарование"
+    L["FILTER_COOKING"] = "Мясо и рыба"
+
+    L["TOOLTIP_HINT_LEFT"] = "ЛКМ: Открыть/Закрыть"
+    L["TOOLTIP_HINT_SHIFT"] = "Shift + Клик: Сменить фильтр"
+    L["TOOLTIP_HINT_RIGHT"] = "ПКМ: Переместить кнопку"
+end
 addonTable.L = L
