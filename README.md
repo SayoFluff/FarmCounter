@@ -5,10 +5,11 @@
 ### ✨ Key Features
 
 * **All-in-One Tracking:** Automatically detects and counts items in your bags based on category (Ores, Herbs, Leather, Wood, Enchanting, Cooking).
+* **Goals & Alerts:** Set custom targets for items and receive visual and audio alerts when you reach them.
 * **Dynamic Visual Feedback:** The window border changes color based on your active filter, so you always know what you are tracking at a glance.
 * **Housing Ready:** Fully supports the new **Housing Materials** (Wood, Parts & Materials), including specific items like *Ashwood*.
 * **Smart Memory:** Window position, size, and active filters are saved **separately for each character**.
-* **Multi-Language:** Fully localized in English, German, French, Spanish, and Italian.
+* **Multi-Language:** Fully localized in English, German, French, Spanish, Italian, and Russian.
 
 ---
 
@@ -26,41 +27,9 @@ Switch between filters instantly by **Shift-Clicking** the Minimap button. The b
 
 ---
 
-### 🎮 How to Use
+### 🎯 Farming Goals & Alerts
 
-**Minimap Button:**
-* **Left Click:** Open/Close the window.
-* **Shift + Left Click:** Cycle through filters (Ores -> Herbs -> Leather -> etc.).
-* **Right Click:** Drag to move the button.
+Transform your farming into a mission! You can now set custom target amounts for specific items.
 
-
-**Slash Commands:**
-* `/fc` - Toggle the main window.
-* `/fc debug` - Shows ItemID and ClassID of the item under your mouse cursor (useful for reporting missing items).
-
-**Farming Goals & Alerts You can now set target amounts for specific items!**
-
-* Set a Goal: Left-Click any item in the list to enter a target amount (e.g., "100").
-* Visual Progress: The counter changes to Current / Goal (e.g., "42 / 100").
-* Goal Reached: Once you hit your target:
-* The text turns GREEN.
-* A Raid Warning Sound (Horn) plays.
-* A notification appears on screen and in chat.
-* Remove Goal: Simply Right-Click the item.
-
----
-
-### 🌍 Supported Languages
-
-FarmCounter automatically detects your WoW client language:
-
-* 🇺🇸 English
-* 🇩🇪 German (Deutsch)
-* 🇫🇷 French (Français)
-* 🇪🇸 Spanish (Español)
-* 🇮🇹 Italian (Italiano)
-* 🇷🇺 Russian (Русский)
----
-
-*Simple. Efficient. Essential.*
-**Download FarmCounter today and optimize your farming!**
+* **Set a Goal:** **Left-Click** any item in the list to enter a target amount (e.g., "100").
+* **Visual Progress:** The counter updates to show `Current / Goal
