@@ -1,18 +1,24 @@
 -- ============================================================================
--- FARMCOUNTER 7.0 - Alert Function
+-- FARMCOUNTER 7.1 - New Filters (Elements & Gems)
 -- ============================================================================
 
 local addonName, addonTable = ...
 local L = addonTable.L
 
 local FILTER_ALL = 1; local FILTER_ORES = 2; local FILTER_HERBS = 3
-local FILTER_SKINNING = 4; local FILTER_HOUSING = 5; local FILTER_ENCHANTING = 6; local FILTER_COOKING = 7
+local FILTER_SKINNING = 4; local FILTER_HOUSING = 5; local FILTER_ENCHANTING = 6
+local FILTER_COOKING = 7; local FILTER_ELEMENTAL = 8; local FILTER_GEMS = 9
 
 local BORDER_COLORS = {
-    [FILTER_ALL] = {1.0, 0.85, 0.0}, [FILTER_ORES] = {1.0, 0.3, 0.2},
-    [FILTER_HERBS] = {0.2, 1.0, 0.2}, [FILTER_SKINNING] = {0.6, 0.4, 0.2},
-    [FILTER_HOUSING] = {0.0, 0.7, 1.0}, [FILTER_ENCHANTING] = {0.8, 0.4, 1.0},
-    [FILTER_COOKING] = {1.0, 0.5, 0.0}
+    [FILTER_ALL] = {1.0, 0.85, 0.0},        -- Gold
+    [FILTER_ORES] = {1.0, 0.3, 0.2},        -- Red
+    [FILTER_HERBS] = {0.2, 1.0, 0.2},       -- Green
+    [FILTER_SKINNING] = {0.6, 0.4, 0.2},    -- Brown
+    [FILTER_HOUSING] = {0.0, 0.7, 1.0},     -- Blue
+    [FILTER_ENCHANTING] = {0.8, 0.4, 1.0},  -- Purple
+    [FILTER_COOKING] = {1.0, 0.5, 0.0},     -- Orange
+    [FILTER_ELEMENTAL] = {0.0, 1.0, 1.0},   -- Cyan
+    [FILTER_GEMS] = {1.0, 0.4, 0.8}         -- Pink
 }
 
 local db
@@ -25,7 +31,7 @@ local sessionGoalMet = {}
 local UpdateFarmList, UpdateMinimapIcon, UpdateBorderColor
 
 -- ----------------------------------------------------------------------------
--- POPUP DIALOG (FIXED LOCALIZATION)
+-- POPUP DIALOG
 -- ----------------------------------------------------------------------------
 StaticPopupDialogs["FARMCOUNTER_SET_GOAL"] = {
     text = L["GOAL_POPUP_TEXT"],
@@ -48,11 +54,9 @@ StaticPopupDialogs["FARMCOUNTER_SET_GOAL"] = {
         
         if value > 0 then
             db.goals[data.itemID] = value
-            -- FIX: Benutze Localization Variable
             print("|cFF00FF00FarmCounter:|r " .. string.format(L["GOAL_SET"], data.itemName, value))
         else
             db.goals[data.itemID] = nil
-            -- FIX: Benutze Localization Variable (für "Entfernt" beim Leeren via Textfeld)
             print("|cFF00FF00FarmCounter:|r " .. string.format(L["GOAL_REMOVED"], data.itemName))
         end
         sessionGoalMet[data.itemID] = false 
@@ -134,12 +138,14 @@ local function GetFilterName(mode)
     elseif mode == FILTER_SKINNING then return L["FILTER_SKINNING"]
     elseif mode == FILTER_HOUSING then return L["FILTER_HOUSING"]
     elseif mode == FILTER_ENCHANTING then return L["FILTER_ENCHANTING"]
-    elseif mode == FILTER_COOKING then return L["FILTER_COOKING"] end
+    elseif mode == FILTER_COOKING then return L["FILTER_COOKING"]
+    elseif mode == FILTER_ELEMENTAL then return L["FILTER_ELEMENTAL"]
+    elseif mode == FILTER_GEMS then return L["FILTER_GEMS"] end
     return "Unknown"
 end
 
 local function ToggleFilter()
-    db.filterMode = db.filterMode + 1; if db.filterMode > 7 then db.filterMode = 1 end
+    db.filterMode = db.filterMode + 1; if db.filterMode > 9 then db.filterMode = 1 end
     UpdateMinimapIcon(); UpdateBorderColor(); UpdateFarmList()
     print("|cFF00FF00FarmCounter:|r " .. L["FILTER_CHANGE"] .. " " .. GetFilterName(db.filterMode))
 end
@@ -153,81 +159,37 @@ UpdateMinimapIcon = function()
     elseif db.filterMode == FILTER_HOUSING then minimapIcon:SetTexture("Interface\\Icons\\inv_tradeskillitem_03")
     elseif db.filterMode == FILTER_ENCHANTING then minimapIcon:SetTexture("Interface\\Icons\\inv_enchant_duststrange")
     elseif db.filterMode == FILTER_COOKING then minimapIcon:SetTexture("Interface\\Icons\\inv_misc_food_15")
+    elseif db.filterMode == FILTER_ELEMENTAL then minimapIcon:SetTexture("Interface\\Icons\\inv_elemental_primal_fire")
+    elseif db.filterMode == FILTER_GEMS then minimapIcon:SetTexture("Interface\\Icons\\inv_misc_gem_diamond_01")
     else minimapIcon:SetTexture("Interface\\Icons\\inv_misc_bag_08") end
 end
 
 local function InitMinimapButton()
     minimapBtn = CreateFrame("Button", "FarmCounterMinimapButton", Minimap)
-    minimapBtn:SetFrameStrata("MEDIUM")
-    minimapBtn:SetSize(31, 31)
-    minimapBtn:SetFrameLevel(8)
-    
-    minimapIcon = minimapBtn:CreateTexture(nil, "BACKGROUND")
-    minimapIcon:SetSize(21, 21)
-    minimapIcon:SetPoint("CENTER")
-    
+    minimapBtn:SetFrameStrata("MEDIUM"); minimapBtn:SetSize(31, 31); minimapBtn:SetFrameLevel(8)
+    minimapIcon = minimapBtn:CreateTexture(nil, "BACKGROUND"); minimapIcon:SetSize(21, 21); minimapIcon:SetPoint("CENTER")
     local border = minimapBtn:CreateTexture(nil, "OVERLAY")
-    border:SetTexture("Interface\\Minimap\\MiniMap-TrackingBorder")
-    border:SetSize(53, 53)
-    border:SetPoint("TOPLEFT")
-    
+    border:SetTexture("Interface\\Minimap\\MiniMap-TrackingBorder"); border:SetSize(53, 53); border:SetPoint("TOPLEFT")
     UpdateMinimapIcon()
     
-    -- NEUE POSITIONS-LOGIK (Kreis-Mathematik)
     local function UpdatePos()
-        local angle = math.rad(db.minimapPos or 45)
-        local radius = 80 -- Standard Radius der Minimap
-        
-        -- Wir berechnen die Position relativ zur MITTE (Center)
-        local x = math.cos(angle) * radius
-        local y = math.sin(angle) * radius
-        
+        local a = math.rad(db.minimapPos or 45); local r = 80; local x = math.cos(a) * r; local y = math.sin(a) * r
         minimapBtn:SetPoint("CENTER", Minimap, "CENTER", x, y)
     end
-    
     UpdatePos()
-
-    minimapBtn:RegisterForDrag("RightButton")
-    minimapBtn:SetMovable(true)
-    
-    minimapBtn:SetScript("OnDragStart", function()
-        minimapBtn:SetScript("OnUpdate", function()
-            local mx, my = Minimap:GetCenter()
-            local cx, cy = GetCursorPosition()
-            local scale = Minimap:GetEffectiveScale()
-            
-            -- Berechne den Winkel zwischen Maus und Minimap-Mitte
-            local dx = (cx / scale) - mx
-            local dy = (cy / scale) - my
-            
-            -- Speichere den Winkel
-            db.minimapPos = math.deg(math.atan2(dy, dx))
-            UpdatePos()
-        end)
-    end)
-    
-    minimapBtn:SetScript("OnDragStop", function()
-        minimapBtn:SetScript("OnUpdate", nil)
-    end)
-    
-    minimapBtn:SetScript("OnClick", function(self, b)
-        if b == "LeftButton" then
-            if IsShiftKeyDown() then ToggleFilter()
-            else if FarmFrame:IsShown() then FarmFrame:Hide() else FarmFrame:Show() end end
-        end
-    end)
-    
+    minimapBtn:RegisterForDrag("RightButton"); minimapBtn:SetMovable(true)
+    minimapBtn:SetScript("OnDragStart", function() minimapBtn:SetScript("OnUpdate", function()
+        local mx, my = Minimap:GetCenter(); local cx, cy = GetCursorPosition(); local s = Minimap:GetEffectiveScale()
+        db.minimapPos = math.deg(math.atan2((cy/s)-my, (cx/s)-mx)); UpdatePos()
+    end) end)
+    minimapBtn:SetScript("OnDragStop", function() minimapBtn:SetScript("OnUpdate", nil) end)
+    minimapBtn:SetScript("OnClick", function(self, b) if b == "LeftButton" then if IsShiftKeyDown() then ToggleFilter() else if FarmFrame:IsShown() then FarmFrame:Hide() else FarmFrame:Show() end end end end)
     minimapBtn:SetScript("OnEnter", function(self)
-        GameTooltip:SetOwner(self, "ANCHOR_LEFT")
-        GameTooltip:AddLine(L["TITLE"].." 7.2")
-        GameTooltip:AddLine(L["TOOLTIP_HINT_LEFT"], 1, 1, 1)
-        GameTooltip:AddLine(L["TOOLTIP_HINT_SHIFT"], 0, 1, 0)
-        GameTooltip:AddLine(L["TOOLTIP_HINT_RIGHT"], 0.7, 0.7, 0.7)
-        GameTooltip:AddLine(" ")
-        
+        GameTooltip:SetOwner(self, "ANCHOR_LEFT"); GameTooltip:AddLine(L["TITLE"].." 7.1")
+        GameTooltip:AddLine(L["TOOLTIP_HINT_LEFT"], 1, 1, 1); GameTooltip:AddLine(L["TOOLTIP_HINT_SHIFT"], 0, 1, 0)
+        GameTooltip:AddLine(L["TOOLTIP_HINT_RIGHT"], 0.7, 0.7, 0.7); GameTooltip:AddLine(" ")
         local c = BORDER_COLORS[db.filterMode or 1]
-        GameTooltip:AddDoubleLine(L["FILTER_CHANGE"], GetFilterName(db.filterMode), 1, 1, 1, c[1], c[2], c[3])
-        GameTooltip:Show()
+        GameTooltip:AddDoubleLine(L["FILTER_CHANGE"], GetFilterName(db.filterMode), 1, 1, 1, c[1], c[2], c[3]); GameTooltip:Show()
     end)
     minimapBtn:SetScript("OnLeave", function() GameTooltip:Hide() end)
 end
@@ -236,56 +198,22 @@ local function GetItemRow(i)
     if not itemRows[i] then
         local r = CreateFrame("Button", nil, Content)
         r:SetHeight(20); r:SetPoint("LEFT", 10, 0); r:SetPoint("RIGHT", -5, 0)
-        
-        -- 1. ICON (Links)
-        r.icon = r:CreateTexture(nil, "ARTWORK")
-        r.icon:SetSize(16, 16)
-        r.icon:SetPoint("LEFT", 0, 0)
-        
-        -- 2. ANZAHL (Ganz Rechts angepinnt)
-        r.count = r:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-        r.count:SetPoint("RIGHT", r, "RIGHT", -5, 0) -- Rechtsbündig am Rand
-        r.count:SetJustifyH("RIGHT")
-        -- Keine feste Breite mehr nötig, da rechts verankert
-        
-        -- 3. NAME (Füllt den Platz dazwischen)
-        r.name = r:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-        r.name:SetPoint("LEFT", r.icon, "RIGHT", 5, 0) -- Startet direkt am Icon
-        r.name:SetPoint("RIGHT", r.count, "LEFT", -5, 0) -- Endet vor der Zahl
-        r.name:SetJustifyH("LEFT")
-        r.name:SetWordWrap(false) -- Text abschneiden, falls zu lang
-        
-        -- CLICK HANDLER
+        r.icon = r:CreateTexture(nil, "ARTWORK"); r.icon:SetSize(16, 16); r.icon:SetPoint("LEFT", 0, 0)
+        r.count = r:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall"); r.count:SetPoint("RIGHT", r, "RIGHT", -5, 0); r.count:SetJustifyH("RIGHT")
+        r.name = r:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall"); r.name:SetPoint("LEFT", r.icon, "RIGHT", 5, 0); r.name:SetPoint("RIGHT", r.count, "LEFT", -5, 0); r.name:SetJustifyH("LEFT"); r.name:SetWordWrap(false)
         r:RegisterForClicks("LeftButtonUp", "RightButtonUp")
         r:SetScript("OnClick", function(self, button)
             if not self.itemID then return end
-            
             if button == "LeftButton" then
-                local currentGoal = 0
-                if db.goals and db.goals[self.itemID] then currentGoal = db.goals[self.itemID] end
+                local currentGoal = 0; if db.goals and db.goals[self.itemID] then currentGoal = db.goals[self.itemID] end
                 local data = { itemID = self.itemID, itemName = self.name:GetText(), currentGoal = currentGoal }
                 StaticPopup_Show("FARMCOUNTER_SET_GOAL", data.itemName, nil, data)
-                
             elseif button == "RightButton" then
-                if db.goals and db.goals[self.itemID] then
-                    db.goals[self.itemID] = nil
-                    sessionGoalMet[self.itemID] = false
-                    print("|cFF00FF00FarmCounter:|r " .. string.format(L["GOAL_REMOVED"], self.name:GetText()))
-                    UpdateFarmList()
-                end
+                if db.goals and db.goals[self.itemID] then db.goals[self.itemID] = nil; sessionGoalMet[self.itemID] = false; print("|cFF00FF00FarmCounter:|r " .. string.format(L["GOAL_REMOVED"], self.name:GetText())); UpdateFarmList() end
             end
         end)
-        
-        -- Hover Effect
-        r:SetScript("OnEnter", function(self) 
-            GameTooltip:SetOwner(self, "ANCHOR_TOP")
-            GameTooltip:SetItemByID(self.itemID)
-            GameTooltip:AddLine(" ")
-            GameTooltip:AddLine(L["TOOLTIP_HINT_ITEM_GOAL"])
-            GameTooltip:Show() 
-        end)
+        r:SetScript("OnEnter", function(self) GameTooltip:SetOwner(self, "ANCHOR_TOP"); GameTooltip:SetItemByID(self.itemID); GameTooltip:AddLine(" "); GameTooltip:AddLine(L["TOOLTIP_HINT_ITEM_GOAL"]); GameTooltip:Show() end)
         r:SetScript("OnLeave", function() GameTooltip:Hide() end)
-        
         itemRows[i] = r
     end return itemRows[i]
 end
@@ -301,8 +229,11 @@ local function GetHeaderRow(i)
     end return headerRows[i]
 end
 
+-- ============================================================================
+-- CORE LOGIC - Background Alerting & New Filters
+-- ============================================================================
 UpdateFarmList = function()
-    if not FarmFrame:IsShown() then return end
+    -- 1. IMMER TASCHEN SCANNEN (Egal ob Fenster offen oder zu)
     local items = {}; local found = false; local mode = db.filterMode or FILTER_ALL
     for bag = 0, 5 do
         for slot = 1, C_Container.GetContainerNumSlots(bag) do
@@ -315,18 +246,50 @@ UpdateFarmList = function()
                     local isSkin = (sub == 5 or sub == 6)
                     local isWood = (sub == 1 or sub == 11 or sub == 13)
                     local isEnch = (sub == 12); local isCook = (sub == 8)
-                    if mode == FILTER_ALL then if isOre or isHerb or isSkin or isWood or isEnch or isCook then add = true end
+                    local isElem = (sub == 10)
+                    local isGem = (sub == 4)
+
+                    if mode == FILTER_ALL then 
+                        if isOre or isHerb or isSkin or isWood or isEnch or isCook or isElem or isGem then add = true end
                     elseif mode == FILTER_ORES and isOre then add = true
                     elseif mode == FILTER_HERBS and isHerb then add = true
                     elseif mode == FILTER_SKINNING and isSkin then add = true
                     elseif mode == FILTER_HOUSING and isWood then add = true
                     elseif mode == FILTER_ENCHANTING and isEnch then add = true
-                    elseif mode == FILTER_COOKING and isCook then add = true end
+                    elseif mode == FILTER_COOKING and isCook then add = true
+                    elseif mode == FILTER_ELEMENTAL and isElem then add = true
+                    elseif mode == FILTER_GEMS and isGem then add = true
+                    end
+
                     if add then items[info.itemID] = (items[info.itemID] or 0) + info.stackCount; found = true end
                 end
             end
         end
     end
+
+    -- 2. ALARM PRÜFUNG (Läuft auch im Hintergrund)
+    if db.goals then
+        for id, count in pairs(items) do
+            local goal = db.goals[id]
+            if goal and goal > 0 then
+                if count >= goal then
+                    if not sessionGoalMet[id] then
+                        local n = C_Item.GetItemInfo(id) or "Item"
+                        PlaySound(8959, "Master")
+                        RaidNotice_AddMessage(RaidBossEmoteFrame, string.format(L["GOAL_COMPLETED"], n), ChatTypeInfo["RAID_WARNING"])
+                        print("|cFF00FF00FarmCounter:|r " .. string.format(L["GOAL_COMPLETED"], n))
+                        sessionGoalMet[id] = true
+                    end
+                else
+                    sessionGoalMet[id] = false
+                end
+            end
+        end
+    end
+
+    -- 3. VISUALS ABBRECHEN, wenn Fenster zu
+    if not FarmFrame:IsShown() then return end
+
     for _, r in pairs(itemRows) do r:Hide() end; for _, h in pairs(headerRows) do h:Hide() end
     if not found then local r = GetItemRow(1); r.icon:SetTexture(nil); r.count:SetText(""); r.name:SetText(L["NOTHING_FOUND"]); r:SetPoint("TOPLEFT", Content, "TOPLEFT", 0, 0); r:Show(); return end
     
@@ -352,26 +315,12 @@ UpdateFarmList = function()
                 local r = GetItemRow(ri); r.itemID = item.id
                 r.icon:SetTexture(item.icon); r.name:SetText(item.name)
                 
-                -- GOAL LOGIC
                 local goal = (db.goals and db.goals[item.id]) or 0
                 if goal > 0 then
                     r.count:SetText(item.count .. " / " .. goal)
-                    if item.count >= goal then
-                        r.count:SetTextColor(0, 1, 0) -- GREEN
-                        if not sessionGoalMet[item.id] then
-                            -- SOUND ALERT
-                            PlaySound(8959, "Master") 
-                            RaidNotice_AddMessage(RaidBossEmoteFrame, string.format(L["GOAL_COMPLETED"], item.name), ChatTypeInfo["RAID_WARNING"])
-                            print("|cFF00FF00FarmCounter:|r " .. string.format(L["GOAL_COMPLETED"], item.name))
-                            sessionGoalMet[item.id] = true
-                        end
-                    else
-                        r.count:SetTextColor(1, 1, 1) -- White
-                        sessionGoalMet[item.id] = false
-                    end
+                    if item.count >= goal then r.count:SetTextColor(0, 1, 0) else r.count:SetTextColor(1, 1, 1) end
                 else
-                    r.count:SetText(item.count)
-                    r.count:SetTextColor(1, 1, 1)
+                    r.count:SetText(item.count); r.count:SetTextColor(1, 1, 1)
                 end
                 
                 local rc, gc, bc = C_Item.GetItemQualityColor(item.quality); r.name:SetTextColor(rc, gc, bc)
@@ -396,8 +345,11 @@ FarmFrame:SetScript("OnEvent", function(self, event, arg1)
         if db.point then FarmFrame:ClearAllPoints(); FarmFrame:SetPoint(db.point, UIParent, db.relativePoint, db.x, db.y) else FarmFrame:SetPoint("CENTER") end
         InitMinimapButton(); UpdateBorderColor()
         if db.isVisible then FarmFrame:Show() else FarmFrame:Hide() end
-        print("|cFF00FF00FarmCounter 7.0|r " .. L["LOADED"])
-    elseif event == "BAG_UPDATE" and self:IsShown() then UpdateFarmList()
+        print("|cFF00FF00FarmCounter 7.1|r " .. L["LOADED"])
+    
+    elseif event == "BAG_UPDATE" then 
+        UpdateFarmList()
+        
     elseif event == "GET_ITEM_INFO_RECEIVED" then UpdateFarmList() end
 end)
 FarmFrame:RegisterEvent("ADDON_LOADED"); FarmFrame:RegisterEvent("BAG_UPDATE")

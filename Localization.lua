@@ -11,7 +11,7 @@ L["LOADING"] = "Loading..."
 L["FILTER_CHANGE"] = "Filter:"
 
 L["GOAL_POPUP_TEXT"] = "Enter target amount for:\n%s"
-L["GOAL_SET"] = "Goal set for %s: %s"       -- NEU
+L["GOAL_SET"] = "Goal set for %s: %s"
 L["GOAL_COMPLETED"] = "Goal Reached: %s!"
 L["GOAL_REMOVED"] = "Goal removed for: %s"
 L["TOOLTIP_HINT_ITEM_GOAL"] = "|cFF00FF00Left Click:|r Set Goal\n|cFFFF0000Right Click:|r Remove Goal"
@@ -23,6 +23,8 @@ L["FILTER_SKINNING"] = "Leather & Cloth"
 L["FILTER_HOUSING"] = "Wood & Parts"
 L["FILTER_ENCHANTING"] = "Enchanting"
 L["FILTER_COOKING"] = "Meat & Fish"
+L["FILTER_ELEMENTAL"] = "Elementals"
+L["FILTER_GEMS"] = "Gems"
 
 L["TOOLTIP_HINT_LEFT"] = "Left Click: Open/Close"
 L["TOOLTIP_HINT_SHIFT"] = "Shift + Click: Change Filter"
@@ -44,7 +46,7 @@ if GetLocale() == "deDE" then
     L["FILTER_CHANGE"] = "Filter:"
 
     L["GOAL_POPUP_TEXT"] = "Ziel-Menge eingeben für:\n%s"
-    L["GOAL_SET"] = "Ziel gesetzt für %s: %s"   -- NEU
+    L["GOAL_SET"] = "Ziel gesetzt für %s: %s"
     L["GOAL_COMPLETED"] = "Ziel erreicht: %s!"
     L["GOAL_REMOVED"] = "Ziel entfernt für: %s"
     L["TOOLTIP_HINT_ITEM_GOAL"] = "|cFF00FF00Linksklick:|r Ziel setzen\n|cFFFF0000Rechtsklick:|r Ziel löschen"
@@ -56,6 +58,8 @@ if GetLocale() == "deDE" then
     L["FILTER_HOUSING"] = "Hölzer & Mat."
     L["FILTER_ENCHANTING"] = "Verzauberkunst"
     L["FILTER_COOKING"] = "Fleisch & Fisch"
+    L["FILTER_ELEMENTAL"] = "Elementare"
+    L["FILTER_GEMS"] = "Edelsteine"
 
     L["TOOLTIP_HINT_LEFT"] = "Links: Öffnen/Schließen"
     L["TOOLTIP_HINT_SHIFT"] = "Shift + Klick: Filter ändern"
@@ -71,7 +75,7 @@ if GetLocale() == "frFR" then
     L["LOADING"] = "Chargement..."
     L["FILTER_CHANGE"] = "Filtre:"
     L["GOAL_POPUP_TEXT"] = "Objectif pour:\n%s"
-    L["GOAL_SET"] = "Objectif défini pour %s: %s" -- NEU
+    L["GOAL_SET"] = "Objectif défini pour %s: %s"
     L["GOAL_COMPLETED"] = "Objectif atteint: %s!"
     L["GOAL_REMOVED"] = "Objectif supprimé: %s"
     L["TOOLTIP_HINT_ITEM_GOAL"] = "|cFF00FF00Clic Gauche:|r Définir\n|cFFFF0000Clic Droit:|r Supprimer"
@@ -83,6 +87,8 @@ if GetLocale() == "frFR" then
     L["FILTER_HOUSING"] = "Bois & Matériaux"
     L["FILTER_ENCHANTING"] = "Enchantement"
     L["FILTER_COOKING"] = "Viande & Poisson"
+    L["FILTER_ELEMENTAL"] = "Élémentaires"
+    L["FILTER_GEMS"] = "Gemmes"
 
     L["TOOLTIP_HINT_LEFT"] = "Clic Gauche: Ouvrir/Fermer"
     L["TOOLTIP_HINT_SHIFT"] = "Shift + Clic: Changer Filtre"
@@ -98,7 +104,7 @@ if GetLocale() == "esES" or GetLocale() == "esMX" then
     L["LOADING"] = "Cargando..."
     L["FILTER_CHANGE"] = "Filtro:"
     L["GOAL_POPUP_TEXT"] = "Objetivo para:\n%s"
-    L["GOAL_SET"] = "Objetivo establecido para %s: %s" -- NEU
+    L["GOAL_SET"] = "Objetivo establecido para %s: %s"
     L["GOAL_COMPLETED"] = "Objetivo completado: %s!"
     L["GOAL_REMOVED"] = "Objetivo eliminado: %s"
     L["TOOLTIP_HINT_ITEM_GOAL"] = "|cFF00FF00Clic Izq:|r Fijar\n|cFFFF0000Clic Der:|r Borrar"
@@ -110,6 +116,8 @@ if GetLocale() == "esES" or GetLocale() == "esMX" then
     L["FILTER_HOUSING"] = "Madera & Materiales"
     L["FILTER_ENCHANTING"] = "Encantamiento"
     L["FILTER_COOKING"] = "Carne & Pescado"
+    L["FILTER_ELEMENTAL"] = "Elementales"
+    L["FILTER_GEMS"] = "Gemas"
 
     L["TOOLTIP_HINT_LEFT"] = "Clic Izquierdo: Abrir/Cerrar"
     L["TOOLTIP_HINT_SHIFT"] = "Mayús + Clic: Cambiar Filtro"
@@ -125,7 +133,7 @@ if GetLocale() == "itIT" then
     L["LOADING"] = "Caricamento..."
     L["FILTER_CHANGE"] = "Filtro:"
     L["GOAL_POPUP_TEXT"] = "Obiettivo per:\n%s"
-    L["GOAL_SET"] = "Obiettivo impostato per %s: %s" -- NEU
+    L["GOAL_SET"] = "Obiettivo impostato per %s: %s"
     L["GOAL_COMPLETED"] = "Obiettivo raggiunto: %s!"
     L["GOAL_REMOVED"] = "Obiettivo rimosso: %s"
     L["TOOLTIP_HINT_ITEM_GOAL"] = "|cFF00FF00Clic Sinistro:|r Imposta\n|cFFFF0000Clic Destro:|r Rimuovi"
@@ -137,11 +145,14 @@ if GetLocale() == "itIT" then
     L["FILTER_HOUSING"] = "Legname & Materiali"
     L["FILTER_ENCHANTING"] = "Incantamento"
     L["FILTER_COOKING"] = "Carne & Pesce"
+    L["FILTER_ELEMENTAL"] = "Elementali"
+    L["FILTER_GEMS"] = "Gemme"
 
     L["TOOLTIP_HINT_LEFT"] = "Clic Sinistro: Apri/Chiudi"
     L["TOOLTIP_HINT_SHIFT"] = "Maiusc + Clic: Cambia Filtro"
     L["TOOLTIP_HINT_RIGHT"] = "Clic Destro: Sposta"
 end
+
 -- ============================================================================
 -- 6. RUSSIAN (Translator: ZamestoTV)
 -- ============================================================================
@@ -151,7 +162,6 @@ if GetLocale() == "ruRU" then
     L["LOADING"] = "Загрузка..."
     L["FILTER_CHANGE"] = "Фильтр:"
 
-    -- New Goal System
     L["GOAL_POPUP_TEXT"] = "Введите количество для:\n%s"
     L["GOAL_SET"] = "Цель установлена для %s: %s"
     L["GOAL_COMPLETED"] = "Цель достигнута: %s!"
@@ -165,9 +175,12 @@ if GetLocale() == "ruRU" then
     L["FILTER_HOUSING"] = "Древесина и детали"
     L["FILTER_ENCHANTING"] = "Зачарование"
     L["FILTER_COOKING"] = "Мясо и рыба"
+    L["FILTER_ELEMENTAL"] = "Элементали"
+    L["FILTER_GEMS"] = "Самоцветы"
 
     L["TOOLTIP_HINT_LEFT"] = "ЛКМ: Открыть/Закрыть"
     L["TOOLTIP_HINT_SHIFT"] = "Shift + Клик: Сменить фильтр"
     L["TOOLTIP_HINT_RIGHT"] = "ПКМ: Переместить кнопку"
 end
+
 addonTable.L = L
