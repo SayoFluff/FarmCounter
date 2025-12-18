@@ -28,17 +28,25 @@ Switch between filters instantly by **Shift-Clicking** the Minimap button. The b
 
 ### 🎮 How to Use
 
-* **Minimap Button:**
+**Minimap Button:**
 * **Left Click:** Open/Close the window.
 * **Shift + Left Click:** Cycle through filters (Ores -> Herbs -> Leather -> etc.).
 * **Right Click:** Drag to move the button.
 
 
-* **Slash Commands:**
+**Slash Commands:**
 * `/fc` - Toggle the main window.
 * `/fc debug` - Shows ItemID and ClassID of the item under your mouse cursor (useful for reporting missing items).
 
+**Farming Goals & Alerts You can now set target amounts for specific items!**
 
+* Set a Goal: Left-Click any item in the list to enter a target amount (e.g., "100").
+* Visual Progress: The counter changes to Current / Goal (e.g., "42 / 100").
+* Goal Reached: Once you hit your target:
+* The text turns GREEN.
+* A Raid Warning Sound (Horn) plays.
+* A notification appears on screen and in chat.
+* Remove Goal: Simply Right-Click the item.
 
 ---
 
