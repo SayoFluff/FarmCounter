@@ -126,5 +126,27 @@ if GetLocale() == "itIT" then
     L["TOOLTIP_HINT_RIGHT"] = "Clic Destro: Sposta"
 end
 
+-- ============================================================================
+-- 6. RUSSIAN (Translator ZamestoTV)
+-- ============================================================================
+if GetLocale() == "ruRU" then
+   L["LOADED"] = "загружено. /fc debug для проверки ID предмета."
+   L["NOTHING_FOUND"] = "Предметы для этого фильтра не найдены."
+   L["LOADING"] = "Загрузка..."
+   L["FILTER_CHANGE"] = "Фильтр:"
+
+   L["FILTER_ALL"] = "Все (Итог)"
+   L["FILTER_ORES"] = "Руды и камень"
+   L["FILTER_HERBS"] = "Травы"
+   L["FILTER_SKINNING"] = "Кожа и ткань"
+   L["FILTER_HOUSING"] = "Древесина и детали"
+   L["FILTER_ENCHANTING"] = "Зачарование"
+   L["FILTER_COOKING"] = "Мясо и рыба"
+
+   L["TOOLTIP_HINT_LEFT"] = "ЛКМ: Открыть/Закрыть"
+   L["TOOLTIP_HINT_SHIFT"] = "Shift + Клик: Сменить фильтр"
+   L["TOOLTIP_HINT_RIGHT"] = "ПКМ: Переместить кнопку"
+end
+
 -- Tabelle bereitstellen
 addonTable.L = L
