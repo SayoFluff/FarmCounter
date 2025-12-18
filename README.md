@@ -15,7 +15,7 @@
 
 ### 🔍 Filters & Visuals
 
-Switch between filters instantly by **Shift-Clicking** the Minimap button. The border color and icon update automatically:
+Select your desired filter instantly via the new **Right-Click Menu** on the Minimap button. The border color and icon update automatically:
 
 1. 🟡 **All (Summary):** Shows everything (Gold Border).
 2. 🔴 **Ores & Stone:** Tracks Mining resources (Red Border / Pickaxe Icon).
@@ -48,8 +48,8 @@ Transform your farming into a mission! You can now set custom target amounts for
 
 **Minimap Button:**
 * **Left Click:** Open/Close the window.
-* **Shift + Left Click:** Cycle through filters (Ores -> Herbs -> Leather -> etc.).
-* **Right Click:** Drag to move the button (sticks perfectly to the minimap border).
+* **Right Click:** Open the **Filter Menu** (Select Ores, Herbs, etc. directly).
+* **Right Click + Drag:** Move the button (sticks perfectly to the minimap border).
 
 **Slash Commands:**
 * `/fc` - Toggle the main window.
