@@ -1,19 +1,46 @@
-PROJEKT: FarmCounter (WoW Addon)
-STATUS: Funktioniert stand Patch 11.0.7 (The War Within)
+PROJECT: FarmCounter (WoW Addon)
+VERSION: 7.2 (Hotfix / MenuUtil Update)
+STATUS: Working as of Patch 11.2.7 (The War Within)
 
-FUNKTIONSWEISE:
-1. Scannt Taschen nach Items mit ClassID 7 (Handwerkswaren).
-2. Filtert nach SubClasses:
-   - Erze (2)
-   - Kräuter (3)
-   - Leder/Stoff (4)
-   - Housing/Holz (SubIDs: 1, 11, 13)
-   - VZ (12)
-   - Kochen (8)
-3. Speichert Fenster-Position & Filter pro Charakter (SavedVariablesPerCharacter).
-4. Nutzt FileIDs für Icons, um Fehler zu vermeiden.
+FILE STRUCTURE:
+1. FarmCounter.toc       -> Loads Localization.lua -> FarmCounter.lua.
+                            Uses "SavedVariablesPerCharacter".
+                            Points to IconTexture: Logo.png.
+2. Localization.lua      -> Texts for DE, EN, FR, ES, IT, RU.
+                            Includes "Midnight" Pre-Support (EXP_11).
+3. FarmCounter.lua       -> Core logic, GUI, Events, Goal System.
+4. Logo.png              -> Custom Icon for the addon list.
 
-ANLEITUNG FÜR UPDATE (z.B. Midnight):
-1. In der .toc Datei die Interface-Nummer aktualisieren.
-2. In der .lua Datei die Tabelle 'EXPANSION_NAMES' erweitern:
-   [11] = "Midnight" (oder welche ID die neue Expansion hat).
+FUNCTIONALITY:
+1. Item Scan (C_Item.GetItemInfoInstant):
+   - Scans for ClassID 7 (Tradeskill Goods).
+   - Filters relevant SubClasses:
+     * Ores (7), Herbs (9)
+     * Leather/Cloth (5, 6)
+     * Housing (1, 11, 13) -> IMPORTANT: SubClass 13 required for new materials!
+     * Enchanting (12), Cooking (8)
+     * NEW: Gems (4), Elementals (10)
+
+2. Controls & Menu (MenuUtil):
+   - API Change: "EasyMenu" was removed in TWW.
+   - Replacement: Uses "MenuUtil.CreateContextMenu" for the right-click menu on the Minimap button.
+   - Features: Left-Click (Toggle Window), Right-Click (Filter Menu), Right+Drag (Move Button).
+
+3. Goal System:
+   - Storage: In "FarmCounterDB.goals" (Per Character).
+   - Alert: Plays SoundID 8959 (Raid Warning Horn) + Chat Message.
+   - Background Mode: Alert triggers even if the window is closed.
+
+UPDATE GUIDE (e.g., WoW Midnight):
+1. .toc File: Update Interface number.
+2. Localization.lua:
+   - Check if "EXP_11" (Midnight) is named correctly.
+   - Add new expansion "EXP_12" if necessary.
+3. FarmCounter.lua:
+   - Check if Blizzard introduced new SubClasses for Class 7.
+   - If menu errors occur: Check if "MenuUtil" API has changed.
+
+KNOWN "FIXES":
+- Icons: Uses text paths (strings) instead of FileIDs to prevent "black icons".
+- Menu Crash: Caused by deprecated "EasyMenu" function -> Fixed by "MenuUtil" implementation (v7.2).
+- Housing: SubClass 11 (Parts) and 13 (Materials) are essential for current Housing items.
