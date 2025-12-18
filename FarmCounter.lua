@@ -393,6 +393,21 @@ FarmFrame:RegisterEvent("BAG_UPDATE")
 
 SLASH_FARMCOUNTER1 = "/fc"
 SlashCmdList["FARMCOUNTER"] = function(msg)
-    if msg == "debug" then print("Debug: Mouseover Item.")
-    else if FarmFrame:IsShown() then FarmFrame:Hide() else FarmFrame:Show() end end
+    if msg == "debug" then
+        -- Versuche, das Item unter der Maus (im Tooltip) zu finden
+        local _, link = GameTooltip:GetItem()
+        if link then
+            local itemID, _, _, _, _, classID, subClassID = C_Item.GetItemInfoInstant(link)
+            print("|cFF00FF00FarmCounter Debug:|r")
+            print("Item: " .. link)
+            print("ItemID: " .. (itemID or "Unknown"))
+            print("ClassID: " .. (classID or "Unknown") .. " (Muss 7 sein)")
+            print("SubClassID: " .. (subClassID or "Unknown"))
+        else
+            print("|cFF00FF00FarmCounter:|r Kein Item erkannt. Bitte mit der Maus über ein Item in der Tasche fahren.")
+        end
+    else 
+        -- Fenster umschalten (Normales Verhalten)
+        if FarmFrame:IsShown() then FarmFrame:Hide() else FarmFrame:Show() end 
+    end
 end
