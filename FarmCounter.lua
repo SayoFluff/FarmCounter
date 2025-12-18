@@ -351,7 +351,7 @@ FarmFrame:SetScript("OnEvent", function(self, event, arg1)
         if db.point then FarmFrame:ClearAllPoints(); FarmFrame:SetPoint(db.point, UIParent, db.relativePoint, db.x, db.y) else FarmFrame:SetPoint("CENTER") end
         InitMinimapButton(); UpdateBorderColor()
         if db.isVisible then FarmFrame:Show() else FarmFrame:Hide() end
-        print("|cFF00FF00FarmCounter 7.2|r " .. L["LOADED"])
+        print("|cFF00FF00FarmCounter 7.0|r " .. L["LOADED"])
     elseif event == "BAG_UPDATE" and self:IsShown() then UpdateFarmList()
     elseif event == "GET_ITEM_INFO_RECEIVED" then UpdateFarmList() end
 end)
