@@ -46,7 +46,13 @@ Transform your farming into a mission! You can now set custom target amounts for
 * **Remove Goal:** Simply **Right-Click** the item to clear the goal.
 
 ---
+### 🛠 Installation
 
+1.  Download the latest release from [CurseForge](https://www.curseforge.com/wow/addons/farmcounter-the-ultimate-farming-tracker).
+2.  Unzip the folder into your WoW directory: `_retail_/Interface/AddOns/`.
+3.  Start the game.
+
+---   
 ### 🎮 How to Use
 
 **Minimap Button:**
