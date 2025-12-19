@@ -2,7 +2,7 @@
 
 **FarmCounter** is a lightweight, all-in-one farming tracker designed to keep your inventory organized and your farming sessions efficient. Whether you are gathering herbs, mining ores, hunting **Elementals**, or collecting materials for the **Housing System**, FarmCounter gives you a clear, real-time overview of your loot.
 
-![Version](https://img.shields.io/badge/Version-7.2.1-green) ![WoW Patch](https://img.shields.io/badge/Patch-11.2.7-blue)
+![Version](https://img.shields.io/badge/Version-7.2.2-green) ![WoW Patch](https://img.shields.io/badge/Patch-11.2.7-blue)
 
 ## ✨ Key Features
 
