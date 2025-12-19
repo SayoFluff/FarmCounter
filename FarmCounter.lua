@@ -1,5 +1,5 @@
 -- ============================================================================
--- FARMCOUNTER 7.2.1 - Minor Fix
+-- FARMCOUNTER 7.2.2 - Quality Icon Fix
 -- ============================================================================
 
 local addonName, addonTable = ...
@@ -12,6 +12,13 @@ local FILTER_COOKING = 7; local FILTER_ELEMENTAL = 8; local FILTER_GEMS = 9
 -- Helper to convert RGB table to Hex string for Menu
 local function RGBToHex(r, g, b)
     return string.format("|cFF%02x%02x%02x", r*255, g*255, b*255)
+end
+
+-- Helper: Ermittelt die Qualitätsstufe (1, 2, 3) für Dragonflight/War Within
+local function GetItemQualityTier(itemID)
+    -- C_TradeSkillUI ist die API für Handwerkswaren-Qualität
+    local quality = C_TradeSkillUI.GetItemReagentQualityByItemInfo(itemID)
+    return quality or 0 
 end
 
 local BORDER_COLORS = {
@@ -192,7 +199,7 @@ local function InitMinimapButton()
     end)
     
     minimapBtn:SetScript("OnEnter", function(self)
-        GameTooltip:SetOwner(self, "ANCHOR_LEFT"); GameTooltip:AddLine(L["TITLE"].." 7.2.1")
+        GameTooltip:SetOwner(self, "ANCHOR_LEFT"); GameTooltip:AddLine(L["TITLE"].." 7.2.2")
         GameTooltip:AddLine(L["TOOLTIP_HINT_LEFT"], 1, 1, 1)
         GameTooltip:AddLine(L["TOOLTIP_HINT_MENU"], 1, 0.82, 0)
         GameTooltip:AddLine(L["TOOLTIP_HINT_DRAG"], 0.7, 0.7, 0.7)
@@ -209,6 +216,13 @@ local function GetItemRow(i)
         local r = CreateFrame("Button", nil, Content)
         r:SetHeight(20); r:SetPoint("LEFT", 10, 0); r:SetPoint("RIGHT", -5, 0)
         r.icon = r:CreateTexture(nil, "ARTWORK"); r.icon:SetSize(16, 16); r.icon:SetPoint("LEFT", 0, 0)
+        
+        -- FIX: Use proper sizing/overlay for Tier Icons
+        r.tierOverlay = r:CreateTexture(nil, "OVERLAY")
+        r.tierOverlay:SetSize(16, 16)
+        r.tierOverlay:SetPoint("TOPLEFT", r.icon, "TOPLEFT", 0, 0) 
+        r.tierOverlay:Hide()
+
         r.count = r:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall"); r.count:SetPoint("RIGHT", r, "RIGHT", -5, 0); r.count:SetJustifyH("RIGHT")
         r.name = r:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall"); r.name:SetPoint("LEFT", r.icon, "RIGHT", 5, 0); r.name:SetPoint("RIGHT", r.count, "LEFT", -5, 0); r.name:SetJustifyH("LEFT"); r.name:SetWordWrap(false)
         r:RegisterForClicks("LeftButtonUp", "RightButtonUp")
@@ -223,7 +237,7 @@ local function GetItemRow(i)
             end
         end)
         r:SetScript("OnEnter", function(self) GameTooltip:SetOwner(self, "ANCHOR_TOP"); GameTooltip:SetItemByID(self.itemID); GameTooltip:AddLine(" "); GameTooltip:AddLine(L["TOOLTIP_HINT_ITEM_GOAL"]); GameTooltip:Show() end)
-        r:SetScript("OnLeave", function() GameTooltip:Hide() end)
+        r:SetScript("OnLeave", function(self) GameTooltip:Hide() end)
         itemRows[i] = r
     end return itemRows[i]
 end
@@ -294,14 +308,17 @@ UpdateFarmList = function()
 
     if not FarmFrame:IsShown() then return end
     for _, r in pairs(itemRows) do r:Hide() end; for _, h in pairs(headerRows) do h:Hide() end
-    if not found then local r = GetItemRow(1); r.icon:SetTexture(nil); r.count:SetText(""); r.name:SetText(L["NOTHING_FOUND"]); r:SetPoint("TOPLEFT", Content, "TOPLEFT", 0, 0); r:Show(); return end
+    if not found then local r = GetItemRow(1); r.icon:SetTexture(nil); r.count:SetText(""); r.name:SetText(L["NOTHING_FOUND"]); r.tierOverlay:Hide(); r:SetPoint("TOPLEFT", Content, "TOPLEFT", 0, 0); r:Show(); return end
     
     local groups, miss = {}, false
     for id, count in pairs(items) do
         local n, _, q, _, _, _, _, _, _, i, _, _, _, _, eid = C_Item.GetItemInfo(id); local te = eid or 0
         if not n then miss = true; local _,_,_,_,ii = C_Item.GetItemInfoInstant(id); table.insert(groups, {id=-1, items={}}); n=L["LOADING"]; i=ii end
         if not groups[te] then groups[te] = {id = te, items = {}} end
-        table.insert(groups[te].items, {id=id, count=count, name=n, quality=q or 1, icon=i})
+        
+        -- Store tier info
+        local tier = GetItemQualityTier(id)
+        table.insert(groups[te].items, {id=id, count=count, name=n, quality=q or 1, icon=i, tier=tier})
     end
     
     local sorted = {}; for _, g in pairs(groups) do table.insert(sorted, g) end
@@ -313,11 +330,29 @@ UpdateFarmList = function()
         h.text:SetText(L["EXP_"..g.id] or ("ID "..g.id))
         h.status:SetText(collapsedGroups[g.id] and "+" or "-"); h:SetPoint("TOPLEFT", Content, "TOPLEFT", 0, y); h:Show(); y = y - 25; hi = hi + 1
         if not collapsedGroups[g.id] then
-            table.sort(g.items, function(a, b) return a.name < b.name end)
+            
+            -- SORTIERUNG: Erst Name, dann Qualität (3>2>1)
+            table.sort(g.items, function(a, b) 
+                if a.name == b.name then
+                    return a.tier > b.tier
+                else
+                    return a.name < b.name 
+                end
+            end)
+
             for _, item in ipairs(g.items) do
                 local r = GetItemRow(ri); r.itemID = item.id
                 r.icon:SetTexture(item.icon); r.name:SetText(item.name)
                 
+                -- FIX: Use SetAtlas instead of SetTexture for Tier Icons
+                if item.tier > 0 then
+                    -- Atlas Names: Professions-Icon-Quality-Tier1-Small
+                    r.tierOverlay:SetAtlas("Professions-Icon-Quality-Tier" .. item.tier .. "-Small")
+                    r.tierOverlay:Show()
+                else
+                    r.tierOverlay:Hide()
+                end
+
                 local goal = (db.goals and db.goals[item.id]) or 0
                 if goal > 0 then r.count:SetText(item.count .. " / " .. goal)
                     if item.count >= goal then r.count:SetTextColor(0, 1, 0) else r.count:SetTextColor(1, 1, 1) end
@@ -344,7 +379,7 @@ FarmFrame:SetScript("OnEvent", function(self, event, arg1)
         if db.point then FarmFrame:ClearAllPoints(); FarmFrame:SetPoint(db.point, UIParent, db.relativePoint, db.x, db.y) else FarmFrame:SetPoint("CENTER") end
         InitMinimapButton(); UpdateBorderColor()
         if db.isVisible then FarmFrame:Show() else FarmFrame:Hide() end
-        print("|cFF00FF00FarmCounter 7.2.1|r " .. L["LOADED"])
+        print("|cFF00FF00FarmCounter 7.2.2|r " .. L["LOADED"])
     elseif event == "BAG_UPDATE" or event == "GET_ITEM_INFO_RECEIVED" then UpdateFarmList() end
 end)
 FarmFrame:RegisterEvent("ADDON_LOADED"); FarmFrame:RegisterEvent("BAG_UPDATE")
@@ -353,6 +388,6 @@ SLASH_FARMCOUNTER1 = "/fc"
 SlashCmdList["FARMCOUNTER"] = function(msg)
     if msg == "debug" then 
         local _, link = GameTooltip:GetItem(); if link then local itemID, _, _, _, _, classID, sub = C_Item.GetItemInfoInstant(link)
-        print("Item: "..link.." ID: "..(itemID or "?").." Class: "..(classID or "?").." Sub: "..(sub or "?")) else print("Mouseover item required.") end
+        print("Item: "..link.." ID: "..(itemID or "?").." Class: "..(classID or "?").." Sub: "..(sub or "?").." Tier: "..GetItemQualityTier(itemID)) else print("Mouseover item required.") end
     else if FarmFrame:IsShown() then FarmFrame:Hide() else FarmFrame:Show() end end
 end

@@ -2,7 +2,7 @@
 ## Title: FarmCounter
 ## Notes: Multi-Language Tracker with Goals (Ores, Herbs, Leather, Housing, Enchanting, Cooking, Gems, Elementals).
 ## Author: Sayo-Flufftiger
-## Version: 7.2.1
+## Version: 7.2.2
 ## SavedVariablesPerCharacter: FarmCounterDB
 ## IconTexture: Interface\AddOns\FarmCounter\Logo.png
 
