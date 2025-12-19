@@ -2,6 +2,9 @@
 
 **FarmCounter** is a lightweight, all-in-one farming tracker designed to keep your inventory organized and your farming sessions efficient. Whether you are gathering herbs, mining ores, hunting **Elementals**, or collecting materials for the **Housing System**, FarmCounter gives you a clear, real-time overview of your loot.
 
+![Version](https://img.shields.io/badge/Version-7.2.1-green)
+![WoW Patch](https://img.shields.io/badge/Patch-11.2.7-blue)
+
 ### ✨ Key Features
 
 * **All-in-One Tracking:** Automatically detects and counts items based on category (Ores, Herbs, Leather, Wood, Enchanting, Cooking, **Gems**, **Elementals**).
@@ -43,7 +46,13 @@ Transform your farming into a mission! You can now set custom target amounts for
 * **Remove Goal:** Simply **Right-Click** the item to clear the goal.
 
 ---
+### 🛠 Installation
 
+1.  Download the latest release from [CurseForge](https://www.curseforge.com/wow/addons/farmcounter-the-ultimate-farming-tracker).
+2.  Unzip the folder into your WoW directory: `_retail_/Interface/AddOns/`.
+3.  Start the game.
+
+---   
 ### 🎮 How to Use
 
 **Minimap Button:**
