@@ -1,5 +1,5 @@
 -- ============================================================================
--- FARMCOUNTER 7.2 - Changed Filterlogic / added Menu
+-- FARMCOUNTER 7.2.1 - Minor Fix
 -- ============================================================================
 
 local addonName, addonTable = ...
@@ -192,7 +192,7 @@ local function InitMinimapButton()
     end)
     
     minimapBtn:SetScript("OnEnter", function(self)
-        GameTooltip:SetOwner(self, "ANCHOR_LEFT"); GameTooltip:AddLine(L["TITLE"].." 7.2")
+        GameTooltip:SetOwner(self, "ANCHOR_LEFT"); GameTooltip:AddLine(L["TITLE"].." 7.2.1")
         GameTooltip:AddLine(L["TOOLTIP_HINT_LEFT"], 1, 1, 1)
         GameTooltip:AddLine(L["TOOLTIP_HINT_MENU"], 1, 0.82, 0)
         GameTooltip:AddLine(L["TOOLTIP_HINT_DRAG"], 0.7, 0.7, 0.7)
@@ -344,7 +344,7 @@ FarmFrame:SetScript("OnEvent", function(self, event, arg1)
         if db.point then FarmFrame:ClearAllPoints(); FarmFrame:SetPoint(db.point, UIParent, db.relativePoint, db.x, db.y) else FarmFrame:SetPoint("CENTER") end
         InitMinimapButton(); UpdateBorderColor()
         if db.isVisible then FarmFrame:Show() else FarmFrame:Hide() end
-        print("|cFF00FF00FarmCounter 7.2|r " .. L["LOADED"])
+        print("|cFF00FF00FarmCounter 7.2.1|r " .. L["LOADED"])
     elseif event == "BAG_UPDATE" or event == "GET_ITEM_INFO_RECEIVED" then UpdateFarmList() end
 end)
 FarmFrame:RegisterEvent("ADDON_LOADED"); FarmFrame:RegisterEvent("BAG_UPDATE")
