@@ -1,5 +1,5 @@
 -- ============================================================================
--- FARMCOUNTER 7.2.2 - Quality Icon Fix
+-- FARMCOUNTER 7.2.3 - Crash Fix (Migration Safety)
 -- ============================================================================
 
 local addonName, addonTable = ...
@@ -16,7 +16,6 @@ end
 
 -- Helper: Ermittelt die Qualitätsstufe (1, 2, 3) für Dragonflight/War Within
 local function GetItemQualityTier(itemID)
-    -- C_TradeSkillUI ist die API für Handwerkswaren-Qualität
     local quality = C_TradeSkillUI.GetItemReagentQualityByItemInfo(itemID)
     return quality or 0 
 end
@@ -34,7 +33,6 @@ local BORDER_COLORS = {
 }
 
 local db
-local collapsedGroups = {}
 local itemRows = {}
 local headerRows = {}
 local sessionGoalMet = {} 
@@ -199,7 +197,7 @@ local function InitMinimapButton()
     end)
     
     minimapBtn:SetScript("OnEnter", function(self)
-        GameTooltip:SetOwner(self, "ANCHOR_LEFT"); GameTooltip:AddLine(L["TITLE"].." 7.2.2")
+        GameTooltip:SetOwner(self, "ANCHOR_LEFT"); GameTooltip:AddLine(L["TITLE"].." 7.2.3")
         GameTooltip:AddLine(L["TOOLTIP_HINT_LEFT"], 1, 1, 1)
         GameTooltip:AddLine(L["TOOLTIP_HINT_MENU"], 1, 0.82, 0)
         GameTooltip:AddLine(L["TOOLTIP_HINT_DRAG"], 0.7, 0.7, 0.7)
@@ -217,7 +215,7 @@ local function GetItemRow(i)
         r:SetHeight(20); r:SetPoint("LEFT", 10, 0); r:SetPoint("RIGHT", -5, 0)
         r.icon = r:CreateTexture(nil, "ARTWORK"); r.icon:SetSize(16, 16); r.icon:SetPoint("LEFT", 0, 0)
         
-        -- FIX: Use proper sizing/overlay for Tier Icons
+        -- FIX: Quality Overlay
         r.tierOverlay = r:CreateTexture(nil, "OVERLAY")
         r.tierOverlay:SetSize(16, 16)
         r.tierOverlay:SetPoint("TOPLEFT", r.icon, "TOPLEFT", 0, 0) 
@@ -248,7 +246,19 @@ local function GetHeaderRow(i)
         b.bg = b:CreateTexture(nil, "BACKGROUND"); b.bg:SetAllPoints(); b.bg:SetColorTexture(0.25, 0.25, 0.25, 0.95)
         b.text = b:CreateFontString(nil, "OVERLAY", "GameFontNormal"); b.text:SetPoint("LEFT", 5, 0)
         b.status = b:CreateFontString(nil, "OVERLAY", "GameFontHighlight"); b.status:SetPoint("RIGHT", -5, 0)
-        b:SetScript("OnClick", function(self) collapsedGroups[self.expacID] = not collapsedGroups[self.expacID]; UpdateFarmList() end)
+        
+        -- FIX: Toggle logic for PER FILTER collapsing WITH SAFETY CHECK
+        b:SetScript("OnClick", function(self) 
+            local mode = db.filterMode or 1
+            if not db.collapsed then db.collapsed = {} end
+            
+            -- SAFETY FIX: Ensure we have a table, overwrite if it's old boolean data
+            if type(db.collapsed[mode]) ~= "table" then db.collapsed[mode] = {} end
+            
+            db.collapsed[mode][self.expacID] = not db.collapsed[mode][self.expacID]
+            UpdateFarmList() 
+        end)
+        
         headerRows[i] = b
     end return headerRows[i]
 end
@@ -328,25 +338,33 @@ UpdateFarmList = function()
     for _, g in ipairs(sorted) do
         local h = GetHeaderRow(hi); h.expacID = g.id
         h.text:SetText(L["EXP_"..g.id] or ("ID "..g.id))
-        h.status:SetText(collapsedGroups[g.id] and "+" or "-"); h:SetPoint("TOPLEFT", Content, "TOPLEFT", 0, y); h:Show(); y = y - 25; hi = hi + 1
-        if not collapsedGroups[g.id] then
-            
-            -- SORTIERUNG: Erst Name, dann Qualität (3>2>1)
+        
+        -- FIX: Read collapsed state PER FILTER with SAFETY CHECK
+        -- Structure: db.collapsed[filterID][expacID]
+        local isCollapsed = false
+        
+        -- Check if db.collapsed[mode] exists AND IS A TABLE (prevents crash on old boolean data)
+        if db.collapsed and type(db.collapsed[mode]) == "table" then
+            isCollapsed = db.collapsed[mode][g.id]
+        end
+        
+        h.status:SetText(isCollapsed and "+" or "-")
+        
+        h:SetPoint("TOPLEFT", Content, "TOPLEFT", 0, y); h:Show(); y = y - 25; hi = hi + 1
+        
+        if not isCollapsed then
+            -- SORTING: Name -> Quality Tier (Highest first)
             table.sort(g.items, function(a, b) 
-                if a.name == b.name then
-                    return a.tier > b.tier
-                else
-                    return a.name < b.name 
-                end
+                if a.name == b.name then return a.tier > b.tier
+                else return a.name < b.name end
             end)
 
             for _, item in ipairs(g.items) do
                 local r = GetItemRow(ri); r.itemID = item.id
                 r.icon:SetTexture(item.icon); r.name:SetText(item.name)
                 
-                -- FIX: Use SetAtlas instead of SetTexture for Tier Icons
+                -- Quality Tier Overlay (Atlas)
                 if item.tier > 0 then
-                    -- Atlas Names: Professions-Icon-Quality-Tier1-Small
                     r.tierOverlay:SetAtlas("Professions-Icon-Quality-Tier" .. item.tier .. "-Small")
                     r.tierOverlay:Show()
                 else
@@ -375,11 +393,15 @@ FarmFrame:SetScript("OnEvent", function(self, event, arg1)
         if not db.width then db.width = 340 end; if not db.height then db.height = 520 end
         if db.isVisible == nil then db.isVisible = false end
         if not db.goals then db.goals = {} end
+        
+        -- Init collapsed table
+        if not db.collapsed then db.collapsed = {} end
+        
         FarmFrame:SetSize(db.width, db.height)
         if db.point then FarmFrame:ClearAllPoints(); FarmFrame:SetPoint(db.point, UIParent, db.relativePoint, db.x, db.y) else FarmFrame:SetPoint("CENTER") end
         InitMinimapButton(); UpdateBorderColor()
         if db.isVisible then FarmFrame:Show() else FarmFrame:Hide() end
-        print("|cFF00FF00FarmCounter 7.2.2|r " .. L["LOADED"])
+        print("|cFF00FF00FarmCounter 7.2.3|r " .. L["LOADED"])
     elseif event == "BAG_UPDATE" or event == "GET_ITEM_INFO_RECEIVED" then UpdateFarmList() end
 end)
 FarmFrame:RegisterEvent("ADDON_LOADED"); FarmFrame:RegisterEvent("BAG_UPDATE")
