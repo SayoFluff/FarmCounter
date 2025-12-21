@@ -6,40 +6,40 @@
 
 ## ✨ Key Features
 
-*   **All-in-One Tracking:** Automatically detects and counts items based on category (Ores, Herbs, Leather, Wood, Enchanting, Cooking, **Gems**, **Elementals**).
-*   **Goals & Background Alerts:** Set custom targets! Alerts (Sound & Chat) trigger **even if the window is closed**, allowing you to keep your screen clean while farming.
-*   **Dynamic Visual Feedback:** The window border changes color based on your active filter, so you always know what you are tracking at a glance.
-*   **Housing Ready:** Fully supports the new **Housing Materials** (Wood, Parts & Materials), including specific items like _Ashwood_.
-*   **Smart Memory:** Window position, size, and active filters are saved **separately for each character**.
-*   **Multi-Language:** Automatically detects your WoW client language.
+* **All-in-One Tracking:** Automatically detects and counts items based on category (Ores, Herbs, Leather, Wood, Enchanting, Cooking, **Gems**, **Elementals**).
+* **Goals & Background Alerts:** Set custom targets! Alerts (Sound & Chat) trigger **even if the window is closed**, allowing you to keep your screen clean while farming.
+* **Dynamic Visual Feedback:** The window border changes color based on your active filter, so you always know what you are tracking at a glance.
+* **Housing Ready:** Fully supports the new **Housing Materials** (Wood, Parts & Materials), including specific items like _Ashwood_.
+* **Smart Memory:** Window position, size, and active filters are saved **separately for each character**.
+* **Multi-Language:** Automatically detects your WoW client language.
 
-***
+---
 
 ## 🎮 How to Use
 
 ### Minimap Button
 
-*   **Left Click:** Open/Close the window.
-*   **Right Click:** Open the **Filter Menu** (Select Ores, Herbs, etc. directly).
-*   **Right Click + Drag:** Move the button (sticks perfectly to the minimap border).
+* **Left Click:** Open/Close the window.
+* **Right Click:** Open the **Filter Menu** (Select Ores, Herbs, etc. directly).
+* **Right Click + Drag:** Move the button (sticks perfectly to the minimap border).
 
 ### Farming Goals & Alerts
 
-*   **Set a Goal:** **Left-Click** any item in the list to enter a target amount (e.g., "100").
-*   **Visual Progress:** The counter updates to show `Current / Goal` (e.g., "42 / 100").
-*   **Goal Reached:** Once you hit your target:
-    *   The text turns **GREEN**.
-    *   🔊 A **Raid Warning Sound** (Horn) plays.
-    *   💬 A notification appears on screen and in chat.
-*   **Background Mode:** You can close the FarmCounter window while farming—the addon will still play the sound and notify you when you reach your goal!
-*   **Remove Goal:** Simply **Right-Click** the item to clear the goal.
+* **Set a Goal:** **Left-Click** any item in the list to enter a target amount (e.g., "100").
+* **Visual Progress:** The counter updates to show `Current / Goal` (e.g., "42 / 100").
+* **Goal Reached:** Once you hit your target:
+    * The text turns **GREEN**.
+    * 🔊 A **Raid Warning Sound** (Horn) plays.
+    * 💬 A notification appears on screen and in chat.
+* **Background Mode:** You can close the FarmCounter window while farming—the addon will still play the sound and notify you when you reach your goal!
+* **Remove Goal:** Simply **Right-Click** the item to clear the goal.
 
 ### Slash Commands
 
-*   `/fc` - Toggle the main window.
-*   `/fc debug` - Shows ItemID and ClassID of the item under your mouse cursor (useful for reporting missing items).
+* `/fc` - Toggle the main window.
+* `/fc debug` - Shows ItemID and ClassID of the item under your mouse cursor (useful for reporting missing items).
 
-***
+---
 
 ## 🔍 Filters & Visuals
 
@@ -55,23 +55,25 @@ Select your desired filter instantly via the new **Right-Click Menu** on the Min
 8.  💎 **Gems:** Tracks raw gems found while mining (Pink Border / Diamond Icon).
 9.  🟦 **Elementals:** Tracks elemental reagents like Primal/Awakened elements (Cyan Border / Fire Icon).
 
-***
+---
 
 ## 🌍 Supported Languages
 
 FarmCounter automatically detects your WoW client language:
 
-*   🇺🇸 English
-*   🇩🇪 German (Deutsch)
-*   🇫🇷 French (Français)
-*   🇪🇸 Spanish (Español)
-*   🇮🇹 Italian (Italiano)
-*   🇷🇺 Russian (Русский)
-*   🇧🇷 Portuguese (Português)
-*   🇰🇷 Korean (한국어)
-*   🇨🇳 Chinese Simplified (简体中文)
-*   🇹🇼 Chinese Traditional (繁體中文)
+* 🇺🇸 English
+* 🇩🇪 German (Deutsch)
+* 🇫🇷 French (Français)
+* 🇪🇸 Spanish (Español)
+* 🇮🇹 Italian (Italiano)
+* 🇷🇺 Russian (Русский)
+* 🇧🇷 Portuguese (Português)
+* 🇰🇷 Korean (한국어)
+* 🇨🇳 Chinese Simplified (简体中文)
+* 🇹🇼 Chinese Traditional (繁體中文)
 
-***
+Found a translation error? Please let us know in the comments so we can improve the localization!
+
+---
 
 _Simple. Efficient. Essential._ **Download FarmCounter today and optimize your farming!**
