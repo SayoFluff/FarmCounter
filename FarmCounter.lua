@@ -1,5 +1,5 @@
 -- ============================================================================
--- FARMCOUNTER 7.2.4 - Added missing Languages
+-- FARMCOUNTER 7.3.0 - Midnight Quality Fix
 -- ============================================================================
 
 local addonName, addonTable = ...
@@ -14,7 +14,7 @@ local function RGBToHex(r, g, b)
     return string.format("|cFF%02x%02x%02x", r*255, g*255, b*255)
 end
 
--- Helper: Ermittelt die Qualitätsstufe (1, 2, 3) für Dragonflight/War Within
+-- Helper: Ermittelt die Qualitätsstufe (1, 2, 3) für Dragonflight/War Within/Midnight
 local function GetItemQualityTier(itemID)
     local quality = C_TradeSkillUI.GetItemReagentQualityByItemInfo(itemID)
     return quality or 0 
@@ -326,9 +326,9 @@ UpdateFarmList = function()
         if not n then miss = true; local _,_,_,_,ii = C_Item.GetItemInfoInstant(id); table.insert(groups, {id=-1, items={}}); n=L["LOADING"]; i=ii end
         if not groups[te] then groups[te] = {id = te, items = {}} end
         
-        -- Store tier info
+        -- Store tier info & expac ID
         local tier = GetItemQualityTier(id)
-        table.insert(groups[te].items, {id=id, count=count, name=n, quality=q or 1, icon=i, tier=tier})
+        table.insert(groups[te].items, {id=id, count=count, name=n, quality=q or 1, icon=i, tier=tier, expacID=te})
     end
     
     local sorted = {}; for _, g in pairs(groups) do table.insert(sorted, g) end
@@ -365,8 +365,15 @@ UpdateFarmList = function()
                 
                 -- Quality Tier Overlay (Atlas)
                 if item.tier > 0 then
-                    r.tierOverlay:SetAtlas("Professions-Icon-Quality-Tier" .. item.tier .. "-Small")
-                    r.tierOverlay:Show()
+                    if item.expacID >= 11 then
+                        -- Neue Midnight-Logik (Expac 11+) mit dynamischem Atlas-String
+                        r.tierOverlay:SetAtlas("Professions-Icon-Quality-12-Tier" .. item.tier .. "-Inv")
+                        r.tierOverlay:Show()
+                    else
+                        -- Alte Logik (Dragonflight / The War Within)
+                        r.tierOverlay:SetAtlas("Professions-Icon-Quality-Tier" .. item.tier .. "-Small")
+                        r.tierOverlay:Show()
+                    end
                 else
                     r.tierOverlay:Hide()
                 end
