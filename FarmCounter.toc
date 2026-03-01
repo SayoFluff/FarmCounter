@@ -1,4 +1,4 @@
-## Interface: 120000
+## Interface: 120001
 ## Title: FarmCounter
 ## Notes: Multi-Language Tracker with Goals (Ores, Herbs, Leather, Housing, Enchanting, Cooking, Gems, Elementals).
 ## Author: Sayo-Flufftiger
